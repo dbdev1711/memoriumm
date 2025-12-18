@@ -1,138 +1,130 @@
-import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../styles/app_styles.dart';
-import '../utils/show_snackbar.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({Key? key}) : super(key: key);
+  const Profile({Key? key, required this.language}) : super(key: key);
+  final String language;
 
   @override
   State<Profile> createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController _nomController = TextEditingController();
+  String _selectedLanguage = 'cat';
 
-  bool _carregantDades = true;
+  // Map per guardar els resultats dels jocs
+  Map<String, int> _results = {
+    'alphabet': 0,
+    'number': 0,
+    'operations': 0,
+    'parelles': 0,
+    'sequencia': 0,
+  };
 
   @override
   void initState() {
     super.initState();
-    _carregaDadesUsuari();
+    _loadLocalData();
   }
 
-  Future<void> _carregaDadesUsuari() async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        setState(() => _carregantDades = false);
-        return;
-      }
+  // Carrega idioma, nom i resultats des de SharedPreferences
+  Future<void> _loadLocalData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedLanguage = prefs.getString('language') ?? 'cat';
+      _nomController.text = prefs.getString('user_name') ?? '';
 
-      final doc = await FirebaseFirestore.instance
-          .collection('usuaris')
-          .doc(user.uid)
-          .get();
-
-      if (doc.exists) {
-        final data = doc.data()!;
-        _nomController.text = data['nom'] ?? '';
-      }
-    }
-    catch (e) {
-      print('Error carregant dades: $e');
-      showSnackBar(context, 'Error carregant dades del perfil.');
-    }
-    finally {
-      setState(() => _carregantDades = false);
-    }
+      // Carreguem les puntuacions (0 si no existeixen)
+      _results['alphabet'] = prefs.getInt('score_alphabet') ?? 0;
+      _results['number'] = prefs.getInt('score_number') ?? 0;
+      _results['operations'] = prefs.getInt('score_operations') ?? 0;
+      _results['parelles'] = prefs.getInt('score_parelles') ?? 0;
+      _results['sequencia'] = prefs.getInt('score_sequencia') ?? 0;
+    });
   }
 
-  Future<void> _desaDades() async {
-    if (!_formKey.currentState!.validate()) return;
+  // Desa nom i idioma localment
+  Future<void> _saveSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('language', _selectedLanguage);
+    await prefs.setString('user_name', _nomController.text);
 
-    final dades = {
-      'nom': _nomController.text,
-      'actualitzat': DateTime.now(),
-    };
-
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-
-      if (user == null) {
-        showSnackBar(context, 'Cap usuari loguejat');
-        return;
-      }
-
-      final String userId = user.uid;
-
-      await FirebaseFirestore.instance
-          .collection('usuaris')
-          .doc(userId)
-          .set(dades, SetOptions(merge: true));
-
-      showSnackBar(context, 'Dades guardades amb èxit!');
-    }
-    catch (e) {
-      showSnackBar(context, 'Error en desar les dades: $e');
-      debugPrint('$e');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text('Perfil', style: AppStyles.appBarText),
-      ),
-      body: _carregantDades
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AppStyles.sizedBoxHeight20,
-                    TextFormField(
-                      textCapitalization: TextCapitalization.sentences,
-                      controller: _nomController,
-                      style: const TextStyle(color: Colors.blue),
-                      decoration: const InputDecoration(
-                        labelText: 'Nom',
-                        labelStyle: const TextStyle(color: Colors.blue),
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person, color: Colors.blue),
-                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blue, width: 1.5)),
-                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blue, width: 2)),
-                      ),
-                      validator: (value) => value == null || value.isEmpty ? 'Introdueix un nom' : null,
-                    ),
-                    AppStyles.sizedBoxHeight40,
-                    ElevatedButton(
-                      onPressed: _desaDades,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(80, 44),
-                        maximumSize: const Size(200, 44),
-                      ),
-                      child: const Text('Desar'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_selectedLanguage == 'cat' ? 'Guardat!' : '¡Guardado!')),
     );
   }
 
   @override
-  void dispose() {
-    _nomController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    final String title = _selectedLanguage == 'cat' ? 'El meu Perfil' : _selectedLanguage == 'esp' ? 'Mi Perfil' : 'My Profile';
+    final String gamesTitle = _selectedLanguage == 'cat' ? 'Rècords Personals' : 'Récords Personales';
+
+    return Scaffold(
+      appBar: AppBar(title: Text(title, style: AppStyles.appBarText), centerTitle: true),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            // SECCIÓ DADES PERSONALS
+            Card(
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _nomController,
+                      decoration: InputDecoration(
+                        labelText: _selectedLanguage == 'cat' ? 'Nom' : 'Nombre',
+                        prefixIcon: const Icon(Icons.edit),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    DropdownButtonFormField<String>(
+                      value: _selectedLanguage,
+                      decoration: InputDecoration(labelText: _selectedLanguage == 'cat' ? 'Idioma' : 'Idioma'),
+                      items: const [
+                        DropdownMenuItem(value: 'cat', child: Text('Català')),
+                        DropdownMenuItem(value: 'esp', child: Text('Español')),
+                        DropdownMenuItem(value: 'eng', child: Text('English')),
+                      ],
+                      onChanged: (val) => setState(() => _selectedLanguage = val!),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _saveSettings,
+                      child: Text(_selectedLanguage == 'cat' ? 'Guardar Canvis' : 'Guardar Cambios'),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            // SECCIÓ RESULTATS JOCS
+            Text(gamesTitle, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
+            const Divider(),
+            _buildResultTile('Alphabet Recall', _results['alphabet']!, Icons.abc),
+            _buildResultTile('Number Recall', _results['number']!, Icons.numbers),
+            _buildResultTile('Operations', _results['operations']!, Icons.calculate),
+            _buildResultTile('Parelles', _results['parelles']!, Icons.extension),
+            _buildResultTile('Seqüència', _results['sequencia']!, Icons.repeat),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResultTile(String gameName, int score, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.blue),
+      title: Text(gameName),
+      trailing: Text(
+        '$score',
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+      ),
+    );
   }
 }

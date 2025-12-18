@@ -8,10 +8,12 @@ import '../widgets/result_panel.dart';
 
 class SequenciaRecall extends StatefulWidget {
   final GameConfig config;
+  final String language; // Afegit
 
   const SequenciaRecall({
     Key? key,
     required this.config,
+    required this.language, // Afegit
   }) : super(key: key);
 
   @override
@@ -63,13 +65,12 @@ class _SequenciaRecallState extends State<SequenciaRecall> {
   }
 
   void _showSequence() {
+    if (!mounted) return;
     setState(() => _isChecking = true);
 
-    // ✅ DURACIÓ DINÀMICA SEGONS NIVELL DE DIFICULTAT
-    // Usa sequenceLength com a proxy de dificultat (més elements = més difícil)
-    final int difficulty = widget.config.sequenceLength - 2; // Normalitza: 3=0, 4=1, 5=2, etc.
-    final baseDelay = 600 + (difficulty * 200); // 600ms fàcil → 1000ms difícil
-    final showDuration = 800 + (difficulty * 300); // 800ms fàcil → 1400ms difícil
+    final int difficulty = widget.config.sequenceLength - 2;
+    final baseDelay = 600 + (difficulty * 200);
+    final showDuration = 800 + (difficulty * 300);
 
     for (int i = 0; i < _sequence.length; i++) {
       final cardToShow = _sequence[i];
@@ -105,7 +106,6 @@ class _SequenciaRecallState extends State<SequenciaRecall> {
 
     if (_sequenceStep < _sequence.length &&
         card.id == _sequence[_sequenceStep].id) {
-      // ✅ PAS CORRECTE
       _sequenceStep++;
 
       if (_sequenceStep == _sequence.length) {
@@ -120,7 +120,6 @@ class _SequenciaRecallState extends State<SequenciaRecall> {
         });
       }
     } else {
-      // ❌ PAS INCORRECTE
       _isChecking = true;
       _showGamePanel(win: false);
     }
@@ -130,18 +129,34 @@ class _SequenciaRecallState extends State<SequenciaRecall> {
     setState(() {
       _showResultPanel = true;
       _resultColor = win ? Colors.green : Colors.red;
-      _resultTitle = win ? '🏆 Correcte!' : '❌ Seqüència incorrecta!';
-      _resultMessage = win
-          ? 'Has completat la seqüència amb èxit!'
-          : 'Ho pots fer millor! Reinicia i torna-ho a provar.';
+
+      if (win) {
+        _resultTitle = widget.language == 'cat' ? '🏆 Correcte!' : widget.language == 'esp' ? '🏆 ¡Correcto!' : '🏆 Correct!';
+        _resultMessage = widget.language == 'cat'
+            ? 'Has completat la seqüència amb èxit!'
+            : widget.language == 'esp'
+                ? '¡Has completado la secuencia con éxito!'
+                : 'You have successfully completed the sequence!';
+      } else {
+        _resultTitle = widget.language == 'cat' ? '❌ Seqüència incorrecta!' : widget.language == 'esp' ? '❌ Secuencia incorrecta!' : '❌ Incorrect sequence!';
+        _resultMessage = widget.language == 'cat'
+            ? 'Ho pots fer millor! Torna-ho a provar.'
+            : widget.language == 'esp'
+                ? '¡Puedes hacerlo mejor! Inténtalo de nuevo.'
+                : 'You can do better! Try again.';
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    String appBarTitle = widget.language == 'cat' ? 'Seqüència' : widget.language == 'esp' ? 'Secuencia' : 'Sequence';
+    String instructionText = widget.language == 'cat' ? 'Repeteix la seqüència!' : widget.language == 'esp' ? '¡Repite la secuencia!' : 'Repeat the sequence!';
+    String stepLabel = widget.language == 'cat' ? 'Pas' : widget.language == 'esp' ? 'Paso' : 'Step';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Seqüència', style: AppStyles.appBarText),
+        title: Text(appBarTitle, style: AppStyles.appBarText),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -151,20 +166,19 @@ class _SequenciaRecallState extends State<SequenciaRecall> {
       ),
       body: Column(
         children: [
-          // ✅ TEXT NOMÉS QUAN L'USUARI HA DE REPETIR
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: _isChecking
-              ? const SizedBox.shrink()
+              ? const SizedBox(height: 70) // Espaiador per mantenir el layout
               : Column(
                   children: [
-                    const Text(
-                      'Repeteix la seqüència!',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    Text(
+                      instructionText,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Item: $_sequenceStep / ${_sequence.length}',
+                      '$stepLabel: $_sequenceStep / ${_sequence.length}',
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -200,6 +214,7 @@ class _SequenciaRecallState extends State<SequenciaRecall> {
               message: _resultMessage,
               color: _resultColor,
               onRestart: _initializeGame,
+              language: widget.language,
             ),
         ],
       ),

@@ -16,6 +16,12 @@ class AppStyles {
     color: Colors.black
   );
 
+  static const idioma = TextStyle(
+    fontSize: 35,
+    fontWeight: FontWeight.bold,
+    color: Colors.black
+  );
+
   static const appBarText = TextStyle(
     fontSize: 35,
     fontWeight: FontWeight.bold,

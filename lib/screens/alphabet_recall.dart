@@ -9,8 +9,9 @@ import '../widgets/result_panel.dart';
 
 class AlphabetRecall extends StatefulWidget {
   final GameConfig config;
+  final String language;
 
-  const AlphabetRecall({Key? key, required this.config}) : super(key: key);
+  const AlphabetRecall({Key? key, required this.config, required this.language}) : super(key: key);
 
   @override
   State<AlphabetRecall> createState() => _AlphabetRecallState();
@@ -139,25 +140,47 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
     setState(() {
       _showResultPanel = true;
       _resultColor = win ? Colors.green : Colors.red;
-      _resultTitle = win ? '🏆 Enhorabona!' : '❌ Error!';
-      _resultMessage = win
-          ? 'Has memoritzat ${widget.config.requiredNumbers} lletres correctament!'
-          : 'Has fallat. La lletra correcta era ${_currentLetterToFind}.';
+
+      if (win) {
+        _resultTitle = widget.language == 'cat' ? '🏆 Enhorabona!' : widget.language == 'esp' ? '🏆 ¡Enhorabuena!' : '🏆 Congratulations!';
+        _resultMessage = widget.language == 'cat'
+            ? 'Has memoritzat ${widget.config.requiredNumbers} lletres correctament!'
+            : widget.language == 'esp'
+              ? '¡Has memorizado ${widget.config.requiredNumbers} letras correctamente!'
+              : 'You memorized ${widget.config.requiredNumbers} letters correctly!';
+      } else {
+        _resultTitle = widget.language == 'cat' ? '❌ Error!' : widget.language == 'esp' ? '❌ ¡Error!' : '❌ Error!';
+        _resultMessage = widget.language == 'cat'
+            ? 'Has fallat. La lletra correcta era $_currentLetterToFind.'
+            : widget.language == 'esp'
+              ? 'Has fallado. La letra correcta era $_currentLetterToFind.'
+              : 'Wrong guess. The correct letter was $_currentLetterToFind.';
+      }
     });
   }
 
   String _getGameStateText() {
-    if (_gameState == 0) return 'Memoritzant (${_memorizationTime.inSeconds}s)...';
-    if (_gameState == 1) return 'Clica la lletra: $_currentLetterToFind';
-    if (_gameState == 2) return 'Joc finalitzat';
-    return 'Preparant...';
+    if (_gameState == 0) {
+      return widget.language == 'cat' ? 'Memoritzant (${_memorizationTime.inSeconds}s)...' :
+             widget.language == 'esp' ? 'Memorizando (${_memorizationTime.inSeconds}s)...' : 'Memorizing (${_memorizationTime.inSeconds}s)...';
+    }
+    if (_gameState == 1) {
+      return widget.language == 'cat' ? 'Clica la lletra: $_currentLetterToFind' :
+             widget.language == 'esp' ? 'Pulsa la letra: $_currentLetterToFind' : 'Tap the letter: $_currentLetterToFind';
+    }
+    if (_gameState == 2) {
+      return widget.language == 'cat' ? 'Joc finalitzat' : widget.language == 'esp' ? 'Juego finalizado' : 'Game finished';
+    }
+    return '...';
   }
 
   @override
   Widget build(BuildContext context) {
+    String appBarTitle = widget.language == 'cat' ? 'Alfabètic' : widget.language == 'esp' ? 'Alfabético' : 'Alphabet';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Alfabètic', style: AppStyles.appBarText),
+        title: Text(appBarTitle, style: AppStyles.appBarText),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -203,6 +226,7 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
               message: _resultMessage,
               color: _resultColor,
               onRestart: _initializeGame,
+              language: widget.language, // Recorda passar l'idioma també al ResultPanel si el vols traduir
             ),
         ],
       ),

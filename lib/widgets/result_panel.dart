@@ -8,6 +8,7 @@ class ResultPanel extends StatelessWidget {
   final Color color;
   final VoidCallback onRestart;
   final VoidCallback? onBackToLevels;
+  final String language; // Afegim el paràmetre d'idioma
 
   const ResultPanel({
     Key? key,
@@ -15,11 +16,31 @@ class ResultPanel extends StatelessWidget {
     required this.message,
     required this.color,
     required this.onRestart,
+    required this.language, // Ara és obligatori
     this.onBackToLevels,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Definició de traduccions internes per als botons
+    final Map<String, Map<String, String>> translations = {
+      'menu': {
+        'cat': 'Menú',
+        'esp': 'Menú',
+        'eng': 'Menu',
+      },
+      'levels': {
+        'cat': 'Nivells',
+        'esp': 'Niveles',
+        'eng': 'Levels',
+      },
+      'restart': {
+        'cat': 'Reinicia',
+        'esp': 'Reiniciar',
+        'eng': 'Restart',
+      },
+    };
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -28,6 +49,7 @@ class ResultPanel extends StatelessWidget {
         border: Border(top: BorderSide(color: color, width: 3)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min, // Ajusta l'espai al contingut
         children: [
           Text(
             title,
@@ -48,27 +70,37 @@ class ResultPanel extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Botó Menú
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => const Menu()),
+                    (route) => false, // Neteja la pila de navegació
                   );
                 },
-                child: const Text('Menú', style: AppStyles.textButtonDialog),
+                child: Text(
+                  translations['menu']![language] ?? 'Menu',
+                  style: AppStyles.textButtonDialog,
+                ),
               ),
               const SizedBox(width: 8),
+              // Botó Nivells
               TextButton(
-                onPressed: onBackToLevels ??
-                    () {
-                      Navigator.pop(context);
-                    },
-                child: const Text('Nivells', style: AppStyles.textButtonDialog),
+                onPressed: onBackToLevels ?? () => Navigator.pop(context),
+                child: Text(
+                  translations['levels']![language] ?? 'Levels',
+                  style: AppStyles.textButtonDialog,
+                ),
               ),
               const SizedBox(width: 8),
+              // Botó Reinicia
               TextButton(
                 onPressed: onRestart,
-                child: const Text('Reinicia', style: AppStyles.textButtonDialog),
+                child: Text(
+                  translations['restart']![language] ?? 'Restart',
+                  style: AppStyles.textButtonDialog,
+                ),
               ),
             ],
           ),

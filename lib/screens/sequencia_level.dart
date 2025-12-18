@@ -5,41 +5,37 @@ import 'sequencia_recall.dart';
 
 class SequenciaLevel extends StatelessWidget {
   final GameMode mode;
-  const SequenciaLevel({Key? key, required this.mode}) : super(key: key);
+  final String language;
 
-  final List<GameConfig> sequenceConfigs = const [
-    GameConfig(mode: GameMode.sequenceRecall, rows: 3, columns: 3, levelTitle: 'Fàcil (3x3)', sequenceLength: 3),
-    GameConfig(mode: GameMode.sequenceRecall, rows: 4, columns: 4, levelTitle: 'Mitjà (4x4)', sequenceLength: 5),
-    GameConfig(mode: GameMode.sequenceRecall, rows: 5, columns: 5, levelTitle: 'Difícil (5x5)', sequenceLength: 7),
-  ];
+  const SequenciaLevel({Key? key, required this.mode, required this.language}) : super(key: key);
 
-  void _startGame(BuildContext context, GameConfig config) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SequenciaRecall(config: config),
-      ),
-    );
+  List<GameConfig> _getConfigs() {
+    return [
+      GameConfig(mode: GameMode.sequenceRecall, rows: 3, columns: 3,
+        levelTitle: language == 'cat' ? 'Fàcil (3x3)' : language == 'esp' ? 'Fácil (3x3)' : 'Easy (3x3)', sequenceLength: 3),
+      GameConfig(mode: GameMode.sequenceRecall, rows: 4, columns: 4,
+        levelTitle: language == 'cat' ? 'Mitjà (4x4)' : language == 'esp' ? 'Medio (4x4)' : 'Medium (4x4)', sequenceLength: 5),
+      GameConfig(mode: GameMode.sequenceRecall, rows: 5, columns: 5,
+        levelTitle: language == 'cat' ? 'Difícil (5x5)' : language == 'esp' ? 'Difícil (5x5)' : 'Hard (5x5)', sequenceLength: 7),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nivell', style: AppStyles.appBarText),
+        title: Text(language == 'cat' ? 'Nivell' : language == 'esp' ? 'Nivel' : 'Level', style: AppStyles.appBarText),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: sequenceConfigs.map((config) {
+          children: _getConfigs().map((config) {
             return Padding(
               padding: const EdgeInsets.all(15),
               child: ElevatedButton(
-                onPressed: () => _startGame(context, config),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(280, 60),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => SequenciaRecall(config: config, language: language))),
+                style: ElevatedButton.styleFrom(minimumSize: const Size(280, 60)),
                 child: Text(config.levelTitle, style: AppStyles.levelText),
               ),
             );

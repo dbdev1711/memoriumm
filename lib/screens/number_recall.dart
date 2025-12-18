@@ -10,8 +10,9 @@ import '../widgets/result_panel.dart';
 
 class NumberRecall extends StatefulWidget {
   final GameConfig config;
+  final String language; // Afegit
 
-  const NumberRecall({Key? key, required this.config}) : super(key: key);
+  const NumberRecall({Key? key, required this.config, required this.language}) : super(key: key);
 
   @override
   State<NumberRecall> createState() => _NumberRecallState();
@@ -131,25 +132,47 @@ class _NumberRecallState extends State<NumberRecall> {
     setState(() {
       _showResultPanel = true;
       _resultColor = win ? Colors.green : Colors.red;
-      _resultTitle = win ? '🏆 Memòria Completa!' : '❌ Error!';
-      _resultMessage = win
-          ? 'Has memoritzat els números correctament.'
-          : 'El número correcte era el $_currentNumberToFind.';
+
+      if (win) {
+        _resultTitle = widget.language == 'cat' ? '🏆 Memòria Completa!' : widget.language == 'esp' ? '🏆 ¡Memoria Completa!' : '🏆 Perfect Memory!';
+        _resultMessage = widget.language == 'cat'
+            ? 'Has memoritzat els números correctament.'
+            : widget.language == 'esp'
+              ? 'Has memorizado los números correctamente.'
+              : 'You have memorized the numbers correctly.';
+      } else {
+        _resultTitle = widget.language == 'cat' ? '❌ Error!' : widget.language == 'esp' ? '❌ ¡Error!' : '❌ Error!';
+        _resultMessage = widget.language == 'cat'
+            ? 'El número correcte era el $_currentNumberToFind.'
+            : widget.language == 'esp'
+              ? 'El número correcto era el $_currentNumberToFind.'
+              : 'The correct number was $_currentNumberToFind.';
+      }
     });
   }
 
   String _getGameStateText() {
-    if (_gameState == 0) return 'Memoritzant (${_memorizationTime.inSeconds}s)...';
-    if (_gameState == 1) return 'Busca el número: $_currentNumberToFind';
-    if (_gameState == 2) return 'Joc finalitzat';
-    return 'Preparant...';
+    if (_gameState == 0) {
+      return widget.language == 'cat' ? 'Memoritzant (${_memorizationTime.inSeconds}s)...' :
+             widget.language == 'esp' ? 'Memorizando (${_memorizationTime.inSeconds}s)...' : 'Memorizing (${_memorizationTime.inSeconds}s)...';
+    }
+    if (_gameState == 1) {
+      return widget.language == 'cat' ? 'Busca el número: $_currentNumberToFind' :
+             widget.language == 'esp' ? 'Busca el número: $_currentNumberToFind' : 'Find the number: $_currentNumberToFind';
+    }
+    if (_gameState == 2) {
+      return widget.language == 'cat' ? 'Joc finalitzat' : widget.language == 'esp' ? 'Juego finalizado' : 'Game finished';
+    }
+    return '...';
   }
 
   @override
   Widget build(BuildContext context) {
+    String appBarTitle = widget.language == 'cat' ? 'Numèric' : widget.language == 'esp' ? 'Numérico' : 'Numbers';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Numèric', style: AppStyles.appBarText),
+        title: Text(appBarTitle, style: AppStyles.appBarText),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -210,6 +233,7 @@ class _NumberRecallState extends State<NumberRecall> {
               message: _resultMessage,
               color: _resultColor,
               onRestart: _initializeGame,
+              language: widget.language, // Passat al ResultPanel
             ),
         ],
       ),

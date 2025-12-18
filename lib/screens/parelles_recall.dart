@@ -10,10 +10,12 @@ import '../widgets/card.dart';
 
 class ParellesRecall extends StatefulWidget {
   final GameConfig config;
+  final String language; // Afegit
 
   const ParellesRecall({
     Key? key,
     required this.config,
+    required this.language, // Afegit
   }) : super(key: key);
 
   @override
@@ -153,17 +155,33 @@ class _ParellesRecallState extends State<ParellesRecall> {
     setState(() {
       _showResultPanel = true;
       _resultColor = win ? Colors.green : Colors.red;
-      _resultTitle = win ? '🎉 Felicitats!' : '❌ Error!';
-      _resultMessage =
-          win ? 'Has completat el nivell amb èxit!' : 'Torna-ho a provar.';
+
+      if (win) {
+        _resultTitle = widget.language == 'cat' ? '🎉 Felicitats!' : widget.language == 'esp' ? '🎉 ¡Felicidades!' : '🎉 Congratulations!';
+        _resultMessage = widget.language == 'cat'
+            ? 'Has completat el nivell amb èxit!'
+            : widget.language == 'esp'
+                ? '¡Has completado el nivel con éxito!'
+                : 'You have successfully completed the level!';
+      } else {
+        _resultTitle = widget.language == 'cat' ? '❌ Error!' : widget.language == 'esp' ? '❌ ¡Error!' : '❌ Error!';
+        _resultMessage = widget.language == 'cat'
+            ? 'Torna-ho a provar.'
+            : widget.language == 'esp'
+                ? 'Vuelve a intentarlo.'
+                : 'Try again.';
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    String appBarTitle = widget.language == 'cat' ? 'Parelles' : widget.language == 'esp' ? 'Parejas' : 'Pairs';
+    String pairsText = widget.language == 'cat' ? 'Parelles' : widget.language == 'esp' ? 'Parejas' : 'Pairs';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Parelles', style: AppStyles.appBarText),
+        title: Text(appBarTitle, style: AppStyles.appBarText),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -176,7 +194,7 @@ class _ParellesRecallState extends State<ParellesRecall> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Text(
-              'Parelles: $_matchesFound / $_totalPairsNeeded',
+              '$pairsText: $_matchesFound / $_totalPairsNeeded',
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -211,6 +229,7 @@ class _ParellesRecallState extends State<ParellesRecall> {
               message: _resultMessage,
               color: _resultColor,
               onRestart: _initializeGame,
+              language: widget.language, // Passat al ResultPanel
             ),
         ],
       ),
