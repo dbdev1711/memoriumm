@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'dart:async';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/result_panel.dart';
 import '../models/card_item.dart';
 import '../models/game_config.dart';
@@ -10,12 +10,12 @@ import '../widgets/card.dart';
 
 class ParellesRecall extends StatefulWidget {
   final GameConfig config;
-  final String language; // Afegit
+  final String language;
 
   const ParellesRecall({
     Key? key,
     required this.config,
-    required this.language, // Afegit
+    required this.language,
   }) : super(key: key);
 
   @override
@@ -33,8 +33,8 @@ class _ParellesRecallState extends State<ParellesRecall> {
   String _resultMessage = '';
   bool _isChecking = false;
 
+  final Stopwatch _stopwatch = Stopwatch();
   final Duration _flipDelay = const Duration(milliseconds: 600);
-  late Duration _memorizationTime;
 
   final List<String> _baseCardContents = const [
     '🍎', '🍊', '🍇', '🍉', '🍓', '🥝', '🍍', '🥭',
@@ -46,18 +46,19 @@ class _ParellesRecallState extends State<ParellesRecall> {
   @override
   void initState() {
     super.initState();
-    _setupTimerDuration();
     _initializeGame();
   }
 
-  void _setupTimerDuration() {
-    if (widget.config.rows <= 3) {
-      _memorizationTime = const Duration(seconds: 2);
-    } else if (widget.config.rows <= 4) {
-      _memorizationTime = const Duration(seconds: 4);
-    } else {
-      _memorizationTime = const Duration(seconds: 6);
-    }
+  @override
+  void dispose() {
+    _stopwatch.stop();
+    super.dispose();
+  }
+
+  String _formatTimeWithUnits(Duration duration) {
+    int minutes = duration.inMinutes;
+    int seconds = duration.inSeconds.remainder(60);
+    return minutes > 0 ? '${minutes}m ${seconds}s' : '${seconds}s';
   }
 
   void _initializeGame() {
@@ -67,18 +68,14 @@ class _ParellesRecallState extends State<ParellesRecall> {
       _matchesFound = 0;
       _isChecking = false;
       _showResultPanel = false;
+      _stopwatch.reset();
+      _stopwatch.start();
 
       int totalSquares = widget.config.rows * widget.config.columns;
       _totalPairsNeeded = totalSquares ~/ 2;
 
-      int pairsToUse = _totalPairsNeeded;
-      if (pairsToUse > _baseCardContents.length) {
-        pairsToUse = _baseCardContents.length;
-      }
-
-      List<String> shuffledEmojis = List<String>.from(_baseCardContents)
-        ..shuffle();
-      List<String> selectedContent = shuffledEmojis.take(pairsToUse).toList();
+      List<String> shuffledEmojis = List<String>.from(_baseCardContents)..shuffle();
+      List<String> selectedContent = shuffledEmojis.take(_totalPairsNeeded).toList();
 
       List<String> fullList = [...selectedContent, ...selectedContent];
       fullList.shuffle(Random());
@@ -87,6 +84,17 @@ class _ParellesRecallState extends State<ParellesRecall> {
         _cards.add(CardItem(id: i, content: fullList[i]));
       }
     });
+  }
+
+  // Funció per guardar el millor temps de manera persistent
+  Future<void> _saveBestTime(int timeInMillis) async {
+    final prefs = await SharedPreferences.getInstance();
+    // Usems un valor molt alt per defecte si no hi ha dades
+    int lastBest = prefs.getInt('time_parelles') ?? 99999999;
+
+    if (timeInMillis < lastBest) {
+      await prefs.setInt('time_parelles', timeInMillis);
+    }
   }
 
   void _handleCardTap(CardItem card) {
@@ -144,93 +152,53 @@ class _ParellesRecallState extends State<ParellesRecall> {
     }
   }
 
-  void _revealAllCards() {
-    setState(() {
-      _cards = _cards.map((c) => c.copyWith(isFlipped: true)).toList();
-    });
-  }
-
   void _showGamePanel({required bool win}) {
-    _revealAllCards();
+    if (win) {
+      _stopwatch.stop();
+      _saveBestTime(_stopwatch.elapsedMilliseconds); // Guardem el temps
+    }
+
     setState(() {
       _showResultPanel = true;
       _resultColor = win ? Colors.green : Colors.red;
 
       if (win) {
+        String finalTime = _formatTimeWithUnits(_stopwatch.elapsed);
         _resultTitle = widget.language == 'cat' ? '🎉 Felicitats!' : widget.language == 'esp' ? '🎉 ¡Felicidades!' : '🎉 Congratulations!';
-        _resultMessage = widget.language == 'cat'
-            ? 'Has completat el nivell amb èxit!'
-            : widget.language == 'esp'
-                ? '¡Has completado el nivel con éxito!'
-                : 'You have successfully completed the level!';
+        String timeLabel = widget.language == 'cat' ? 'Temps' : widget.language == 'esp' ? 'Tiempo' : 'Time';
+        _resultMessage = '${widget.language == 'cat' ? 'Has completat el nivell!' : 'Level completed!'}\n$timeLabel: $finalTime';
       } else {
-        _resultTitle = widget.language == 'cat' ? '❌ Error!' : widget.language == 'esp' ? '❌ ¡Error!' : '❌ Error!';
-        _resultMessage = widget.language == 'cat'
-            ? 'Torna-ho a provar.'
-            : widget.language == 'esp'
-                ? 'Vuelve a intentarlo.'
-                : 'Try again.';
+        _resultTitle = '❌ Error!';
+        _resultMessage = '...';
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle = widget.language == 'cat' ? 'Parelles' : widget.language == 'esp' ? 'Parejas' : 'Pairs';
-    String pairsText = widget.language == 'cat' ? 'Parelles' : widget.language == 'esp' ? 'Parejas' : 'Pairs';
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarTitle, style: AppStyles.appBarText),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _isChecking ? null : _initializeGame,
-          ),
-        ],
+        title: Text(widget.language == 'cat' ? 'Parelles' : 'Pairs', style: AppStyles.appBarText),
+        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _initializeGame)],
       ),
       body: Column(
         children: [
-          Container(
+          Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(
-              '$pairsText: $_matchesFound / $_totalPairsNeeded',
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueGrey,
-              ),
-            ),
+            child: Text('$_matchesFound / $_totalPairsNeeded', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
           ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: GridView.builder(
-                physics: const BouncingScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: widget.config.columns,
-                  crossAxisSpacing: 8.0,
-                  mainAxisSpacing: 8.0,
-                ),
-                itemCount: _cards.length,
-                itemBuilder: (context, index) {
-                  return CardWidget(
-                    key: ValueKey(_cards[index].id),
-                    card: _cards[index],
-                    onTap: () => _handleCardTap(_cards[index]),
-                  );
-                },
+            child: GridView.builder(
+              padding: const EdgeInsets.all(12),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: widget.config.columns,
+                crossAxisSpacing: 8, mainAxisSpacing: 8,
               ),
+              itemCount: _cards.length,
+              itemBuilder: (context, index) => CardWidget(card: _cards[index], onTap: () => _handleCardTap(_cards[index])),
             ),
           ),
-          if (_showResultPanel)
-            ResultPanel(
-              title: _resultTitle,
-              message: _resultMessage,
-              color: _resultColor,
-              onRestart: _initializeGame,
-              language: widget.language, // Passat al ResultPanel
-            ),
+          if (_showResultPanel) ResultPanel(title: _resultTitle, message: _resultMessage, color: _resultColor, onRestart: _initializeGame, language: widget.language),
         ],
       ),
     );

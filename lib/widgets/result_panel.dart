@@ -8,7 +8,7 @@ class ResultPanel extends StatelessWidget {
   final Color color;
   final VoidCallback onRestart;
   final VoidCallback? onBackToLevels;
-  final String language; // Afegim el paràmetre d'idioma
+  final String language;
 
   const ResultPanel({
     Key? key,
@@ -16,7 +16,7 @@ class ResultPanel extends StatelessWidget {
     required this.message,
     required this.color,
     required this.onRestart,
-    required this.language, // Ara és obligatori
+    required this.language,
     this.onBackToLevels,
   }) : super(key: key);
 
