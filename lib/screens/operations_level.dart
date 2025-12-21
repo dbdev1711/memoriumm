@@ -11,29 +11,23 @@ class OperationsLevel extends StatelessWidget {
 
   List<GameConfig> _getConfigs() {
     return [
-      // FÀCIL: 2 operacions
       GameConfig(
         mode: GameMode.operations,
-        rows: 2,  // ← AFEGEIX AIXÒ
+        rows: 2,
         sequenceLength: 4,
-        levelTitle: language == 'cat' ? 'Fàcil (2 op.)' :
-                  language == 'esp' ? 'Fácil (2 op.)' : 'Easy (2 op.)',
+        levelTitle: language == 'cat' ? 'Fàcil (2 op.)' : language == 'esp' ? 'Fácil (2 op.)' : 'Easy (2 op.)',
       ),
-      // MITJÀ: 4 operacions
       GameConfig(
         mode: GameMode.operations,
-        rows: 4,  // ← AFEGEIX AIXÒ
+        rows: 4,
         sequenceLength: 6,
-        levelTitle: language == 'cat' ? 'Mitjà (4 op.)' :
-                  language == 'esp' ? 'Medio (4 op.)' : 'Medium (4 op.)',
+        levelTitle: language == 'cat' ? 'Mitjà (4 op.)' : language == 'esp' ? 'Medio (4 op.)' : 'Medium (4 op.)',
       ),
-      // DIFÍCIL: 6 operacions
       GameConfig(
         mode: GameMode.operations,
-        rows: 6,  // ← AFEGEIX AIXÒ
+        rows: 6,
         sequenceLength: 8,
-        levelTitle: language == 'cat' ? 'Difícil (6 op.)' :
-                  language == 'esp' ? 'Difícil (6 op.)' : 'Hard (6 op.)',
+        levelTitle: language == 'cat' ? 'Difícil (6 op.)' : language == 'esp' ? 'Difícil (6 op.)' : 'Hard (6 op.)',
       ),
     ];
   }
@@ -43,7 +37,7 @@ class OperationsLevel extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          language == 'Nivell' ? 'cat' : language == 'esp' ? 'Nivel' : 'Level',
+          language == 'cat' ? 'Nivell' : language == 'esp' ? 'Nivel' : 'Level',
           style: AppStyles.appBarText,
         ),
       ),

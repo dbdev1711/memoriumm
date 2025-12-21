@@ -167,7 +167,7 @@ class _PairsRecallState extends State<PairsRecall> {
   void _showGamePanel({required bool win}) {
     if (win) {
       _stopwatch.stop();
-      _saveStats(_stopwatch.elapsedMilliseconds); // Crida a la nova funció de guardat
+      _saveStats(_stopwatch.elapsedMilliseconds);
     }
 
     setState(() {

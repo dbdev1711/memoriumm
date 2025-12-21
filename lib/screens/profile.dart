@@ -98,11 +98,11 @@ class _ProfileState extends State<Profile> {
             const Divider(),
 
             // FILES DE RESULTATS
-            _buildGameRow(_selectedLanguage == 'cat' ? 'Alfabètic' : 'Alfabético', _results['alphabet']!, Icons.abc_rounded),
-            _buildGameRow(_selectedLanguage == 'cat' ? 'Numèric' : 'Numérico', _results['number']!, Icons.onetwothree_rounded),
-            _buildGameRow(_selectedLanguage == 'cat' ? 'Operacions' : 'Operaciones', _results['operations']!, Icons.calculate_rounded),
-            _buildGameRow(_selectedLanguage == 'cat' ? 'Parelles' : 'Parejas', _results['parelles']!, Icons.grid_view_rounded),
-            _buildGameRow(_selectedLanguage == 'cat' ? 'Seqüència' : 'Secuencia', _results['sequencia']!, Icons.route_rounded),
+            _buildGameRow(_selectedLanguage == 'cat' ? 'Alfabètic' : _selectedLanguage == 'esp' ? 'Alfabético' : 'Alphabet', _results['alphabet']!, Icons.abc_rounded),
+            _buildGameRow(_selectedLanguage == 'cat' ? 'Numèric' : _selectedLanguage == 'esp' ? 'Numérico' : 'Numbers', _results['number']!, Icons.onetwothree_rounded),
+            _buildGameRow(_selectedLanguage == 'cat' ? 'Operacions' : _selectedLanguage == 'esp' ? 'Operaciones' : 'Operations', _results['operations']!, Icons.calculate_rounded),
+            _buildGameRow(_selectedLanguage == 'cat' ? 'Parelles' : _selectedLanguage == 'esp' ? 'Parejas' : 'Pairs', _results['parelles']!, Icons.grid_view_rounded),
+            _buildGameRow(_selectedLanguage == 'cat' ? 'Seqüència' : _selectedLanguage == 'esp' ? 'Secuencia' : 'Sequence', _results['sequencia']!, Icons.route_rounded),
           ],
         ),
       ),
@@ -114,10 +114,10 @@ class _ProfileState extends State<Profile> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
       child: Row(
         children: [
-          Expanded(flex: 3, child: Text(_selectedLanguage == 'cat' ? 'Joc' : 'Juego', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
-          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Fàcil' : 'Fácil', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 17))),
-          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Mitjà' : 'Medio', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange, fontSize: 17))),
-          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Difícil' : 'Difícil', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 17))),
+          Expanded(flex: 3, child: Text(_selectedLanguage == 'cat' ? 'Joc' : _selectedLanguage == 'esp' ? 'Juego' : 'Game', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
+          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Fàcil' : _selectedLanguage == 'esp' ? 'Fácil' : 'Easy', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 17))),
+          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Mitjà' : _selectedLanguage == 'esp' ? 'Medio' : 'Medium', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange, fontSize: 17))),
+          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Difícil' : _selectedLanguage == 'esp' ? 'Difícil' : 'Hard', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 17))),
         ],
       ),
     );
