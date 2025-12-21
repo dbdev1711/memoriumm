@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:math';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/ad_helper.dart';
 import '../widgets/result_panel.dart';
 import '../models/card_item.dart';
 import '../models/game_config.dart';
@@ -33,6 +35,10 @@ class _PairsRecallState extends State<PairsRecall> {
   String _resultMessage = '';
   bool _isChecking = false;
 
+  // Variables per a l'anunci
+  InterstitialAd? _interstitialAd;
+  bool _isAdLoaded = false;
+
   final Stopwatch _stopwatch = Stopwatch();
   final Duration _flipDelay = const Duration(milliseconds: 600);
 
@@ -47,18 +53,44 @@ class _PairsRecallState extends State<PairsRecall> {
   void initState() {
     super.initState();
     _initializeGame();
+    _loadAd(); // Carreguem l'anunci en segon pla només entrar
   }
 
   @override
   void dispose() {
     _stopwatch.stop();
+    _interstitialAd?.dispose(); // Alliberem la memòria de l'anunci
     super.dispose();
   }
 
-  String _formatTimeWithUnits(Duration duration) {
-    int minutes = duration.inMinutes;
-    int seconds = duration.inSeconds.remainder(60);
-    return minutes > 0 ? '${minutes}m ${seconds}s' : '${seconds}s';
+  // Funció per carregar l'Interstitial
+  void _loadAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.getInterstitialAdId('parelles'),
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _loadAd(); // Pre-carreguem el següent per si tornen a jugar
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _loadAd();
+            },
+          );
+          setState(() {
+            _interstitialAd = ad;
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          _isAdLoaded = false;
+          debugPrint('Error carregant anunci: ${err.message}');
+        },
+      ),
+    );
   }
 
   void _initializeGame() {
@@ -86,26 +118,14 @@ class _PairsRecallState extends State<PairsRecall> {
     });
   }
 
-  // MODIFICAT: Funció per guardar el temps segons el nivell
   Future<void> _saveStats(int timeInMillis) async {
     final prefs = await SharedPreferences.getInstance();
-
-    // Determinació del nivell basada en les files
-    String levelKey;
-    if (widget.config.rows <= 3) {
-      levelKey = "Facil";
-    } else if (widget.config.rows <= 4) {
-      levelKey = "Mitja";
-    } else {
-      levelKey = "Dificil";
-    }
-
+    String levelKey = widget.config.rows <= 3 ? "Facil" : (widget.config.rows <= 4 ? "Mitja" : "Dificil");
     String storageKey = 'time_parelles_$levelKey';
     int lastBest = prefs.getInt(storageKey) ?? 99999999;
 
     if (timeInMillis < lastBest) {
       await prefs.setInt(storageKey, timeInMillis);
-      print("Nova millor marca en $levelKey (Parelles): $timeInMillis ms");
     }
   }
 
@@ -170,21 +190,40 @@ class _PairsRecallState extends State<PairsRecall> {
       _saveStats(_stopwatch.elapsedMilliseconds);
     }
 
-    setState(() {
-      _showResultPanel = true;
-      _resultColor = win ? Colors.green : Colors.red;
+    // Aquesta funció mostra la UI final
+    void displayResult() {
+      setState(() {
+        _showResultPanel = true;
+        _resultColor = win ? Colors.green : Colors.red;
 
-      if (win) {
-        String finalTime = _formatTimeWithUnits(_stopwatch.elapsed);
-        _resultTitle = widget.language == 'cat' ? '🎉 Felicitats!' : widget.language == 'esp' ? '🎉 ¡Felicidades!' : '🎉 Congratulations!';
-        String timeLabel = widget.language == 'cat' ? 'Temps' : widget.language == 'esp' ? 'Tiempo' : 'Time';
-        _resultMessage = '${widget.language == 'cat' ? 'Has completat el nivell!' : widget.language == 'esp' ? '¡Has completado el nivel!'
-            : 'Level completed!'}\n$timeLabel: $finalTime';
-      } else {
-        _resultTitle = '❌ Error!';
-        _resultMessage = '...';
-      }
-    });
+        if (win) {
+          String finalTime = _formatTimeWithUnits(_stopwatch.elapsed);
+          _resultTitle = widget.language == 'cat' ? '🎉 Felicitats!' : widget.language == 'esp' ? '🎉 ¡Felicidades!' : '🎉 Congratulations!';
+          String timeLabel = widget.language == 'cat' ? 'Temps' : widget.language == 'esp' ? 'Tiempo' : 'Time';
+          _resultMessage = '${widget.language == 'cat' ? 'Has completat el nivell!' : widget.language == 'esp' ? '¡Has completado el nivel!'
+              : 'Level completed!'}\n$timeLabel: $finalTime';
+        } else {
+          _resultTitle = '❌ Error!';
+          _resultMessage = '...';
+        }
+      });
+    }
+
+    // LLÒGICA DE L'ANUNCI: Es mostra abans del panell de resultats
+    if (_isAdLoaded && _interstitialAd != null) {
+      _interstitialAd!.show().then((_) {
+        displayResult();
+        _isAdLoaded = false;
+      });
+    } else {
+      displayResult(); // Si no s'ha carregat, mostrem directament el resultat
+    }
+  }
+
+  String _formatTimeWithUnits(Duration duration) {
+    int minutes = duration.inMinutes;
+    int seconds = duration.inSeconds.remainder(60);
+    return minutes > 0 ? '${minutes}m ${seconds}s' : '${seconds}s';
   }
 
   @override

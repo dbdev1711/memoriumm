@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:math';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/ad_helper.dart';
 import '../models/game_config.dart';
 import '../styles/app_styles.dart';
 import '../widgets/result_panel.dart';
@@ -42,18 +44,54 @@ class _OperationsRecallState extends State<OperationsRecall> {
   Color _resultColor = Colors.green;
   bool _isGameOver = false;
 
+  // Variables per a l'anunci
+  InterstitialAd? _interstitialAd;
+  bool _isAdLoaded = false;
+
   final Stopwatch _stopwatch = Stopwatch();
 
   @override
   void initState() {
     super.initState();
     _initializeGame();
+    _loadAd(); // Carreguem l'anunci en segon pla
   }
 
   @override
   void dispose() {
     _stopwatch.stop();
+    _interstitialAd?.dispose(); // Alliberem memòria de l'anunci
     super.dispose();
+  }
+
+  // Funció per carregar l'Interstitial d'Operacions
+  void _loadAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.getInterstitialAdId('operations'),
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _loadAd(); // Pre-carreguem el següent
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _loadAd();
+            },
+          );
+          setState(() {
+            _interstitialAd = ad;
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          _isAdLoaded = false;
+          debugPrint('Error carregant anunci d\'operacions: ${err.message}');
+        },
+      ),
+    );
   }
 
   void _initializeGame() {
@@ -115,25 +153,14 @@ class _OperationsRecallState extends State<OperationsRecall> {
     });
   }
 
-  // MÈTODE CORREGIT PER GUARDAR PER NIVELLS
   Future<void> _saveStats(int timeInMillis) async {
     final prefs = await SharedPreferences.getInstance();
-
-    String levelKey;
-    if (widget.config.rows <= 2) {
-      levelKey = "Facil";
-    } else if (widget.config.rows <= 4) {
-      levelKey = "Mitja";
-    } else {
-      levelKey = "Dificil";
-    }
-
+    String levelKey = widget.config.rows <= 2 ? "Facil" : (widget.config.rows <= 4 ? "Mitja" : "Dificil");
     String storageKey = 'time_operations_$levelKey';
     int lastBest = prefs.getInt(storageKey) ?? 99999999;
 
     if (timeInMillis < lastBest) {
       await prefs.setInt(storageKey, timeInMillis);
-      print("Nova millor marca en $levelKey (Operacions): $timeInMillis ms");
     }
   }
 
@@ -164,32 +191,44 @@ class _OperationsRecallState extends State<OperationsRecall> {
 
     if (win) {
       _stopwatch.stop();
-      _saveStats(_stopwatch.elapsedMilliseconds); // Guardem el temps per nivell
+      _saveStats(_stopwatch.elapsedMilliseconds);
     } else {
       _stopwatch.stop();
     }
 
     final sec = _stopwatch.elapsed.inSeconds.remainder(60);
     final min = _stopwatch.elapsed.inMinutes;
-
     String timeLabel = widget.language == 'cat' ? 'Temps' : (widget.language == 'esp' ? 'Tiempo' : 'Time');
     String timeStr = min > 0 ? "\n$timeLabel: ${min}m ${sec}s" : "\n$timeLabel: ${sec}s";
 
-    setState(() {
-      _isGameOver = true;
-      _showResultPanel = true;
-      _resultColor = win ? Colors.green : Colors.red;
+    // Funció per mostrar la UI de resultats
+    void showResultUI() {
+      setState(() {
+        _isGameOver = true;
+        _showResultPanel = true;
+        _resultColor = win ? Colors.green : Colors.red;
 
-      if (win) {
-        _resultTitle = widget.language == 'cat' ? '🎉 Molt bé!' : (widget.language == 'esp' ? '🎉 ¡Muy bien!' : '🎉 Well done!');
-        _resultMessage = (widget.language == 'cat' ? 'Has ordenat correctament!' : (widget.language == 'esp' ? '¡Has ordenado correctamente!' : 'Correctly sorted!')) + timeStr;
-      } else {
-        _resultTitle = '❌ Error';
-        _resultMessage = widget.language == 'cat'
-            ? 'L\'ordre no és correcte.'
-            : (widget.language == 'esp' ? 'El orden no es correcto.' : 'Incorrect order.');
-      }
-    });
+        if (win) {
+          _resultTitle = widget.language == 'cat' ? '🎉 Molt bé!' : (widget.language == 'esp' ? '🎉 ¡Muy bien!' : '🎉 Well done!');
+          _resultMessage = (widget.language == 'cat' ? 'Has ordenat correctament!' : (widget.language == 'esp' ? '¡Has ordenado correctamente!' : 'Correctly sorted!')) + timeStr;
+        } else {
+          _resultTitle = '❌ Error';
+          _resultMessage = widget.language == 'cat'
+              ? 'L\'ordre no és correcte.'
+              : (widget.language == 'esp' ? 'El orden no es correcto.' : 'Incorrect order.');
+        }
+      });
+    }
+
+    // MOSTRAR ANUNCI ABANS DEL PANELL
+    if (_isAdLoaded && _interstitialAd != null) {
+      _interstitialAd!.show().then((_) {
+        showResultUI();
+        _isAdLoaded = false;
+      });
+    } else {
+      showResultUI();
+    }
   }
 
   @override

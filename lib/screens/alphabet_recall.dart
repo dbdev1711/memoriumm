@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:math';
-import 'dart:convert';
+import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/ad_helper.dart';
 import '../models/card_item.dart';
 import '../models/game_config.dart';
 import '../styles/app_styles.dart';
@@ -29,10 +31,50 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
   Color _resultColor = Colors.green;
   final Stopwatch _stopwatch = Stopwatch();
 
+  // Variables per a l'anunci
+  InterstitialAd? _interstitialAd;
+  bool _isAdLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _initializeGame();
+    _loadAd(); // Carreguem l'anunci al principi
+  }
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose(); // Alliberem memòria
+    super.dispose();
+  }
+
+  void _loadAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.getInterstitialAdId('alphabet'),
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _loadAd(); // Pre-carreguem el següent
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _loadAd();
+            },
+          );
+          setState(() {
+            _interstitialAd = ad;
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          _isAdLoaded = false;
+          debugPrint('Error carregant anunci alfabètic: ${err.message}');
+        },
+      ),
+    );
   }
 
   void _initializeGame() {
@@ -96,23 +138,12 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
       final ms = _stopwatch.elapsedMilliseconds;
       final prefs = await SharedPreferences.getInstance();
 
-      // DETERMINEM EL NIVELL SEGONS LES FILES (Igual que fas per al temps de memòria)
-      String levelKey;
-      if (widget.config.rows <= 3) {
-        levelKey = "Facil";
-      } else if (widget.config.rows <= 4) {
-        levelKey = "Mitja";
-      } else {
-        levelKey = "Dificil";
-      }
-
-      // CLAU DINÀMICA: time_alphabet_Facil, time_alphabet_Mitja, etc.
+      String levelKey = widget.config.rows <= 3 ? "Facil" : (widget.config.rows <= 4 ? "Mitja" : "Dificil");
       String storageKey = 'time_alphabet_$levelKey';
 
       int? currentBest = prefs.getInt(storageKey);
       if (currentBest == null || ms < currentBest) {
         await prefs.setInt(storageKey, ms);
-        print("Nova millor marca en $levelKey: $ms ms");
       }
 
       int totalSeconds = _stopwatch.elapsed.inSeconds;
@@ -123,20 +154,33 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
       timeStr = minTime > 0 ? "\n$label: ${minTime}m ${secTime}s" : "\n$label: ${secTime}s";
     }
 
-    setState(() {
-      _gameState = 2;
-      _cards = _cards.map((c) => c.copyWith(isFlipped: true)).toList();
-      _showResultPanel = true;
-      _resultColor = win ? Colors.green : Colors.red;
+    // Funció per mostrar els resultats
+    void showResultUI() {
+      setState(() {
+        _gameState = 2;
+        _cards = _cards.map((c) => c.copyWith(isFlipped: true)).toList();
+        _showResultPanel = true;
+        _resultColor = win ? Colors.green : Colors.red;
 
-      if (win) {
-        _resultTitle = widget.language == 'cat' ? '🏆 Molt bé!' : widget.language == 'esp' ? '🏆 ¡Muy bien!' : '🏆 Well done!';
-        _resultMessage = (widget.language == 'cat' ? 'Lletres ordenades!' : widget.language == 'esp' ? '¡Letras ordenadas!' : 'Letters sorted!') + timeStr;
-      } else {
-        _resultTitle = '❌ Error!';
-        _resultMessage = (widget.language == 'cat' ? 'Era la lletra' : widget.language == 'esp' ? 'Era la letra' : 'It was letter') + ' $_currentLetter';
-      }
-    });
+        if (win) {
+          _resultTitle = widget.language == 'cat' ? '🏆 Molt bé!' : widget.language == 'esp' ? '🏆 ¡Muy bien!' : '🏆 Well done!';
+          _resultMessage = (widget.language == 'cat' ? 'Lletres ordenades!' : widget.language == 'esp' ? '¡Letras ordenadas!' : 'Letters sorted!') + timeStr;
+        } else {
+          _resultTitle = '❌ Error!';
+          _resultMessage = (widget.language == 'cat' ? 'Era la lletra' : widget.language == 'esp' ? 'Era la letra' : 'It was letter') + ' $_currentLetter';
+        }
+      });
+    }
+
+    // LLÒGICA DE L'ANUNCI: Es mostra abans del panell
+    if (_isAdLoaded && _interstitialAd != null) {
+      _interstitialAd!.show().then((_) {
+        showResultUI();
+        _isAdLoaded = false;
+      });
+    } else {
+      showResultUI();
+    }
   }
 
   @override

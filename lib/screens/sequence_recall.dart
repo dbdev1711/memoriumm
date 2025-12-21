@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:math';
+import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/ad_helper.dart';
 import '../models/card_item.dart';
 import '../models/game_config.dart';
 import '../styles/app_styles.dart';
@@ -28,10 +31,52 @@ class _SequenceRecallState extends State<SequenceRecall> {
   Color _resultColor = Colors.green;
   final Stopwatch _stopwatch = Stopwatch();
 
+  // Variables per a l'anunci
+  InterstitialAd? _interstitialAd;
+  bool _isAdLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _initializeGame();
+    _loadAd(); // Carreguem l'anunci al principi
+  }
+
+  @override
+  void dispose() {
+    _stopwatch.stop();
+    _interstitialAd?.dispose(); // Alliberem memòria de l'anunci
+    super.dispose();
+  }
+
+  // Carreguem l'Interstitial per al joc de Seqüència
+  void _loadAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.getInterstitialAdId('sequence'),
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _loadAd(); // Pre-carreguem el següent
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _loadAd();
+            },
+          );
+          setState(() {
+            _interstitialAd = ad;
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          _isAdLoaded = false;
+          debugPrint('Error carregant anunci seqüència: ${err.message}');
+        },
+      ),
+    );
   }
 
   void _initializeGame() {
@@ -106,45 +151,47 @@ class _SequenceRecallState extends State<SequenceRecall> {
       final ms = _stopwatch.elapsedMilliseconds;
       final prefs = await SharedPreferences.getInstance();
 
-      // DETERMINACIÓ DEL NIVELL
-      String levelKey;
-      if (widget.config.columns <= 3) {
-        levelKey = "Facil";
-      } else if (widget.config.columns <= 4) {
-        levelKey = "Mitja";
-      } else {
-        levelKey = "Dificil";
-      }
-
+      String levelKey = widget.config.columns <= 3 ? "Facil" : (widget.config.columns <= 4 ? "Mitja" : "Dificil");
       String storageKey = 'time_sequencia_$levelKey';
       int lastBest = prefs.getInt(storageKey) ?? 99999999;
 
       if (ms < lastBest) {
         await prefs.setInt(storageKey, ms);
-        print("Nova millor marca en $levelKey (Seqüència): $ms ms");
       }
 
       final sec = _stopwatch.elapsed.inSeconds.remainder(60);
       final min = _stopwatch.elapsed.inMinutes;
-
       String timeLabel = widget.language == 'cat' ? 'Temps' : (widget.language == 'esp' ? 'Tiempo' : 'Time');
       timeStr = min > 0 ? "\n$timeLabel: ${min}m ${sec}s" : "\n$timeLabel: ${sec}s";
     }
 
-    setState(() {
-      _isChecking = true;
-      _showResultPanel = true;
-      _resultColor = win ? Colors.green : Colors.red;
+    // Funció per mostrar el panell de resultats
+    void displayResultUI() {
+      setState(() {
+        _isChecking = true;
+        _showResultPanel = true;
+        _resultColor = win ? Colors.green : Colors.red;
 
-      _resultTitle = win
-          ? (widget.language == 'cat' ? '🏆 Correcte!' : widget.language == 'esp' ? '🏆 ¡Correcto!' : '🏆 Correct!')
-          : '❌ Error!';
+        _resultTitle = win
+            ? (widget.language == 'cat' ? '🏆 Correcte!' : widget.language == 'esp' ? '🏆 ¡Correcto!' : '🏆 Correct!')
+            : '❌ Error!';
 
-      _resultMessage = (win
-          ? (widget.language == 'cat' ? 'Seqüència completada!' : widget.language == 'esp' ? '¡Secuencia completada!' : 'Sequence completed!')
-          : (widget.language == 'cat' ? 'Ho pots fer millor!' : widget.language == 'esp' ? '¡Puedes hacerlo mejor!' : 'You can do it better!'))
-          + timeStr;
-    });
+        _resultMessage = (win
+            ? (widget.language == 'cat' ? 'Seqüència completada!' : widget.language == 'esp' ? '¡Secuencia completada!' : 'Sequence completed!')
+            : (widget.language == 'cat' ? 'Ho pots fer millor!' : widget.language == 'esp' ? '¡Puedes hacerlo mejor!' : 'You can do it better!'))
+            + timeStr;
+      });
+    }
+
+    // MOSTRAR ANUNCI ABANS DEL PANELL
+    if (_isAdLoaded && _interstitialAd != null) {
+      _interstitialAd!.show().then((_) {
+        displayResultUI();
+        _isAdLoaded = false;
+      });
+    } else {
+      displayResultUI();
+    }
   }
 
   @override

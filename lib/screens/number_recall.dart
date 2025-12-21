@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:math';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/ad_helper.dart';
 import '../models/card_item.dart';
 import '../models/game_config.dart';
 import '../styles/app_styles.dart';
@@ -26,12 +28,61 @@ class _NumberRecallState extends State<NumberRecall> {
   Color _resultColor = Colors.green;
   final Stopwatch _stopwatch = Stopwatch();
 
+  // Variables per a l'anunci
+  InterstitialAd? _interstitialAd;
+  bool _isAdLoaded = false;
+
   @override
-  void initState() { super.initState(); _initializeGame(); }
+  void initState() {
+    super.initState();
+    _initializeGame();
+    _loadAd(); // Pre-carreguem l'anunci de Números
+  }
+
+  @override
+  void dispose() {
+    _stopwatch.stop();
+    _interstitialAd?.dispose(); // Alliberem memòria de l'anunci
+    super.dispose();
+  }
+
+  // Funció per carregar l'Interstitial de Números
+  void _loadAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.getInterstitialAdId('number'),
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          ad.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _loadAd(); // Pre-carreguem el següent
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              ad.dispose();
+              _loadAd();
+            },
+          );
+          setState(() {
+            _interstitialAd = ad;
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (err) {
+          _isAdLoaded = false;
+          debugPrint('Error carregant anunci numèric: ${err.message}');
+        },
+      ),
+    );
+  }
 
   void _initializeGame() {
     setState(() {
-      _cards.clear(); _currentNumber = 1; _gameState = 0; _showResultPanel = false; _stopwatch.reset();
+      _cards.clear();
+      _currentNumber = 1;
+      _gameState = 0;
+      _showResultPanel = false;
+      _stopwatch.reset();
       int total = widget.config.rows * widget.config.columns;
       int req = min(widget.config.requiredNumbers, total);
       List<int> idxs = List.generate(total, (i) => i)..shuffle();
@@ -42,7 +93,13 @@ class _NumberRecallState extends State<NumberRecall> {
     });
     int sec = widget.config.rows <= 3 ? 2 : (widget.config.rows <= 4 ? 4 : 6);
     Timer(Duration(seconds: sec), () {
-      if (mounted) setState(() { _cards = _cards.map((c) => c.copyWith(isFlipped: false)).toList(); _gameState = 1; _stopwatch.start(); });
+      if (mounted) {
+        setState(() {
+          _cards = _cards.map((c) => c.copyWith(isFlipped: false)).toList();
+          _gameState = 1;
+          _stopwatch.start();
+        });
+      }
     });
   }
 
@@ -51,10 +108,17 @@ class _NumberRecallState extends State<NumberRecall> {
     if (card.content == _currentNumber.toString()) {
       setState(() {
         _cards[_cards.indexOf(card)] = card.copyWith(isFlipped: true, isMatched: true);
-        if (_currentNumber == widget.config.requiredNumbers) { _stopwatch.stop(); _finish(true); }
-        else { _currentNumber++; }
+        if (_currentNumber == widget.config.requiredNumbers) {
+          _stopwatch.stop();
+          _finish(true);
+        } else {
+          _currentNumber++;
+        }
       });
-    } else { _stopwatch.stop(); _finish(false); }
+    } else {
+      _stopwatch.stop();
+      _finish(false);
+    }
   }
 
   Future<void> _finish(bool win) async {
@@ -63,47 +127,48 @@ class _NumberRecallState extends State<NumberRecall> {
       final ms = _stopwatch.elapsedMilliseconds;
       final prefs = await SharedPreferences.getInstance();
 
-      // DETERMINEM EL NIVELL (Igual que a AlphabetRecall)
-      String levelKey;
-      if (widget.config.rows <= 3) {
-        levelKey = "Facil";
-      } else if (widget.config.rows <= 4) {
-        levelKey = "Mitja";
-      } else {
-        levelKey = "Dificil";
-      }
-
-      // CLAU DINÀMICA: time_number_Facil, time_number_Mitja, etc.
+      String levelKey = widget.config.rows <= 3 ? "Facil" : (widget.config.rows <= 4 ? "Mitja" : "Dificil");
       String storageKey = 'time_number_$levelKey';
 
       int? currentBest = prefs.getInt(storageKey);
       if (currentBest == null || ms < currentBest) {
         await prefs.setInt(storageKey, ms);
-        print("Nova millor marca en $levelKey (Numèric): $ms ms");
       }
 
       final sec = _stopwatch.elapsed.inSeconds.remainder(60);
       final min = _stopwatch.elapsed.inMinutes;
-
       String timeLabel = widget.language == 'cat' ? 'Temps' : (widget.language == 'esp' ? 'Tiempo' : 'Time');
       timeStr = min > 0 ? "\n$timeLabel: ${min}m ${sec}s" : "\n$timeLabel: ${sec}s";
     }
 
-    setState(() {
-      _gameState = 2;
-      _cards = _cards.map((c) => c.copyWith(isFlipped: true)).toList();
-      _showResultPanel = true;
-      _resultColor = win ? Colors.green : Colors.red;
+    // Funció per mostrar els resultats
+    void showResultUI() {
+      setState(() {
+        _gameState = 2;
+        _cards = _cards.map((c) => c.copyWith(isFlipped: true)).toList();
+        _showResultPanel = true;
+        _resultColor = win ? Colors.green : Colors.red;
 
-      if (win) {
-        _resultTitle = widget.language == 'cat' ? '🏆 Èxit!' : (widget.language == 'esp' ? '🏆 ¡Éxito!' : '🏆 Success!');
-        _resultMessage = (widget.language == 'cat' ? 'Números trobats!' : (widget.language == 'esp' ? '¡Números encontrados!' : 'Numbers found!')) + timeStr;
-      } else {
-        _resultTitle = '❌ Error!';
-        String errorText = widget.language == 'cat' ? 'Era el número' : (widget.language == 'esp' ? 'Era el número' : 'It was number');
-        _resultMessage = '$errorText $_currentNumber';
-      }
-    });
+        if (win) {
+          _resultTitle = widget.language == 'cat' ? '🏆 Èxit!' : (widget.language == 'esp' ? '🏆 ¡Éxito!' : '🏆 Success!');
+          _resultMessage = (widget.language == 'cat' ? 'Números trobats!' : (widget.language == 'esp' ? '¡Números encontrados!' : 'Numbers found!')) + timeStr;
+        } else {
+          _resultTitle = '❌ Error!';
+          String errorText = widget.language == 'cat' ? 'Era el número' : (widget.language == 'esp' ? 'Era el número' : 'It was number');
+          _resultMessage = '$errorText $_currentNumber';
+        }
+      });
+    }
+
+    // MOSTRAR ANUNCI ABANS DEL PANELL
+    if (_isAdLoaded && _interstitialAd != null) {
+      _interstitialAd!.show().then((_) {
+        showResultUI();
+        _isAdLoaded = false;
+      });
+    } else {
+      showResultUI();
+    }
   }
 
   @override
