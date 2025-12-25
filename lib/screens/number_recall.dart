@@ -47,7 +47,8 @@ class _NumberRecallState extends State<NumberRecall> {
 
   void _loadAd() {
     InterstitialAd.load(
-      adUnitId: AdHelper.getInterstitialAdId('number'),
+      // Corregit a 'numbers' per coincidir amb el teu switch a AdHelper
+      adUnitId: AdHelper.getInterstitialAdId('numbers'),
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
@@ -61,13 +62,19 @@ class _NumberRecallState extends State<NumberRecall> {
               _loadAd();
             },
           );
-          setState(() {
-            _interstitialAd = ad;
-            _isAdLoaded = true;
-          });
+          if (mounted) {
+            setState(() {
+              _interstitialAd = ad;
+              _isAdLoaded = true;
+            });
+          }
         },
         onAdFailedToLoad: (err) {
-          _isAdLoaded = false;
+          if (mounted) {
+            setState(() {
+              _isAdLoaded = false;
+            });
+          }
           debugPrint('Error carregant anunci numèric: ${err.message}');
         },
       ),
@@ -140,6 +147,7 @@ class _NumberRecallState extends State<NumberRecall> {
     }
 
     void showResultUI() {
+      if (!mounted) return;
       setState(() {
         _gameState = 2;
         _cards = _cards.map((c) => c.copyWith(isFlipped: true)).toList();
@@ -157,10 +165,12 @@ class _NumberRecallState extends State<NumberRecall> {
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null) {
+    // APLICACIÓ DE LA LÒGICA DE FREQUÈNCIA (1 cada 4)
+    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
       _interstitialAd!.show().then((_) {
         showResultUI();
         _isAdLoaded = false;
+        _interstitialAd = null;
       });
     }
     else {

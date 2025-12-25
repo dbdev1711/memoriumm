@@ -62,13 +62,19 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
               _loadAd();
             },
           );
-          setState(() {
-            _interstitialAd = ad;
-            _isAdLoaded = true;
-          });
+          if (mounted) {
+            setState(() {
+              _interstitialAd = ad;
+              _isAdLoaded = true;
+            });
+          }
         },
         onAdFailedToLoad: (err) {
-          _isAdLoaded = false;
+          if (mounted) {
+            setState(() {
+              _isAdLoaded = false;
+            });
+          }
           debugPrint('Error carregant anunci alfabètic: ${err.message}');
         },
       ),
@@ -152,7 +158,9 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
       timeStr = minTime > 0 ? "\n$label: ${minTime}m ${secTime}s" : "\n$label: ${secTime}s";
     }
 
+    // Aquesta funció mostra la UI final
     void showResultUI() {
+      if (!mounted) return;
       setState(() {
         _gameState = 2;
         _cards = _cards.map((c) => c.copyWith(isFlipped: true)).toList();
@@ -169,10 +177,12 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null) {
+    // Lògica de control de l'anunci: només si està carregat i el comptador diu que toca
+    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
       _interstitialAd!.show().then((_) {
         showResultUI();
         _isAdLoaded = false;
+        _interstitialAd = null;
       });
     } else {
       showResultUI();

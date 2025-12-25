@@ -78,13 +78,19 @@ class _PairsRecallState extends State<PairsRecall> {
               _loadAd();
             },
           );
-          setState(() {
-            _interstitialAd = ad;
-            _isAdLoaded = true;
-          });
+          if (mounted) {
+            setState(() {
+              _interstitialAd = ad;
+              _isAdLoaded = true;
+            });
+          }
         },
         onAdFailedToLoad: (err) {
-          _isAdLoaded = false;
+          if (mounted) {
+            setState(() {
+              _isAdLoaded = false;
+            });
+          }
           debugPrint('Error carregant anunci: ${err.message}');
         },
       ),
@@ -189,6 +195,7 @@ class _PairsRecallState extends State<PairsRecall> {
     }
 
     void displayResult() {
+      if (!mounted) return;
       setState(() {
         _showResultPanel = true;
         _resultColor = win ? Colors.green : Colors.red;
@@ -205,10 +212,13 @@ class _PairsRecallState extends State<PairsRecall> {
         }
       });
     }
-    if (_isAdLoaded && _interstitialAd != null) {
+
+    // MODIFICACIÓ: Implementació del comptador d'anuncis (1 cada 4)
+    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
       _interstitialAd!.show().then((_) {
         displayResult();
         _isAdLoaded = false;
+        _interstitialAd = null;
       });
     } else {
       displayResult();

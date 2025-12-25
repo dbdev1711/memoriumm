@@ -63,13 +63,19 @@ class _SequenceRecallState extends State<SequenceRecall> {
               _loadAd();
             },
           );
-          setState(() {
-            _interstitialAd = ad;
-            _isAdLoaded = true;
-          });
+          if (mounted) {
+            setState(() {
+              _interstitialAd = ad;
+              _isAdLoaded = true;
+            });
+          }
         },
         onAdFailedToLoad: (err) {
-          _isAdLoaded = false;
+          if (mounted) {
+            setState(() {
+              _isAdLoaded = false;
+            });
+          }
           debugPrint('Error carregant anunci seqüència: ${err.message}');
         },
       ),
@@ -163,6 +169,7 @@ class _SequenceRecallState extends State<SequenceRecall> {
     }
 
     void displayResultUI() {
+      if (!mounted) return;
       setState(() {
         _isChecking = true;
         _showResultPanel = true;
@@ -179,10 +186,12 @@ class _SequenceRecallState extends State<SequenceRecall> {
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null) {
+    // MODIFICACIÓ: Lògica de l'anunci 1 cada 4
+    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
       _interstitialAd!.show().then((_) {
         displayResultUI();
         _isAdLoaded = false;
+        _interstitialAd = null;
       });
     } else {
       displayResultUI();

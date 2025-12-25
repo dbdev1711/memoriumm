@@ -1,12 +1,17 @@
 import 'dart:io';
 
 class AdHelper {
-  // APP ID (per a la teva referència): ca-app-pub-5335679604691429~5297365530
 
-  static String get interstitialAdUnitId {
-    // Aquest mètode es pot sobrecarregar o pots crear un per cada joc
-    // Però per fer-ho més fàcil, crearem un mètode que rebi el tipus de joc
-    return '';
+  static int _gameCounter = 0;
+  static const int adFrequency = 4;
+
+  static bool shouldShowAd() {
+    _gameCounter++;
+    if (_gameCounter >= adFrequency) {
+      _gameCounter = 0;
+      return true;
+    }
+    return false;
   }
 
   static String getInterstitialAdId(String gameType) {
@@ -23,12 +28,10 @@ class AdHelper {
         case 'sequence':
           return 'ca-app-pub-5335679604691429/5139074123';
         default:
-          // ID de test per si de cas el nom no coincideix
           return 'ca-app-pub-3940256099942544/1033173712';
       }
     }
     else {
-      // Si mai fas l'app per a iOS, aquí anirien els IDs de test d'Apple
       return 'ca-app-pub-3940256099942544/4411468910';
     }
   }

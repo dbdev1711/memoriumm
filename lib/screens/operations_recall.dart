@@ -78,13 +78,19 @@ class _OperationsRecallState extends State<OperationsRecall> {
               _loadAd();
             },
           );
-          setState(() {
-            _interstitialAd = ad;
-            _isAdLoaded = true;
-          });
+          if (mounted) {
+            setState(() {
+              _interstitialAd = ad;
+              _isAdLoaded = true;
+            });
+          }
         },
         onAdFailedToLoad: (err) {
-          _isAdLoaded = false;
+          if (mounted) {
+            setState(() {
+              _isAdLoaded = false;
+            });
+          }
           debugPrint('Error carregant anunci d\'operacions: ${err.message}');
         },
       ),
@@ -199,6 +205,7 @@ class _OperationsRecallState extends State<OperationsRecall> {
     String timeStr = min > 0 ? "\n$timeLabel: ${min}m ${sec}s" : "\n$timeLabel: ${sec}s";
 
     void showResultUI() {
+      if (!mounted) return;
       setState(() {
         _isGameOver = true;
         _showResultPanel = true;
@@ -216,10 +223,12 @@ class _OperationsRecallState extends State<OperationsRecall> {
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null) {
+    // Lògica centralitzada d'anuncis (1 cada 4 partides)
+    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
       _interstitialAd!.show().then((_) {
         showResultUI();
         _isAdLoaded = false;
+        _interstitialAd = null;
       });
     } else {
       showResultUI();
