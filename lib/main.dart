@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import '../screens/menu.dart';
 import '../screens/idioma.dart';
 import 'styles/app_styles.dart';
@@ -8,6 +9,7 @@ import 'styles/app_styles.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await _initTracking();
   await MobileAds.instance.initialize();
 
   MobileAds.instance.updateRequestConfiguration(
@@ -20,6 +22,14 @@ void main() async {
   final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
 
   runApp(MyApp(isFirstRun: isFirstRun));
+}
+
+Future<void> _initTracking() async {
+  final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+
+  if (status == TrackingStatus.notDetermined) {
+    await AppTrackingTransparency.requestTrackingAuthorization();
+  }
 }
 
 class MyApp extends StatelessWidget {

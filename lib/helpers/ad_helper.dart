@@ -31,6 +31,9 @@ class AdHelper {
           return 'ca-app-pub-3940256099942544/1033173712';
       }
     }
+    else if (Platform.isIOS) {
+      return 'ca-app-pub-5400203683183472/1576191494'; //
+    }
     else {
       return 'ca-app-pub-3940256099942544/4411468910';
     }
