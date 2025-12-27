@@ -1,6 +1,9 @@
-# Protegir les classes de Google Play Services / AdMob
--keep public class com.google.android.gms.ads.** { *; }
--keep public class com.google.ads.** { *; }
+# Evita que ProGuard doni avisos (warnings) sobre classes de Google que no pot trobar
+-dontwarn com.google.android.gms.**
+-dontwarn com.google.ads.**
 
-# Evitar que es bordin atributs necessaris per a la reflexió
--keepattributes *Annotation*, Signature, EnclosingMethod
+# Manté les interfícies de JavaScript (molt important per a anuncis web/interstitials)
+-keepattributes JavascriptInterface
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
