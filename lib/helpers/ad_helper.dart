@@ -1,7 +1,6 @@
 import 'dart:io';
 
 class AdHelper {
-
   static int _gameCounter = 0;
   static const int adFrequency = 4;
 
@@ -18,24 +17,24 @@ class AdHelper {
     if (Platform.isAndroid) {
       switch (gameType) {
         case 'alphabet':
-          return 'ca-app-pub-5335679604691429/4097455197';
+          return 'ca-app-pub-5400203683183472/7703450299';
         case 'numbers':
-          return 'ca-app-pub-5335679604691429/6034171635';
+          return 'ca-app-pub-5400203683183472/1161274431';
         case 'operations':
-          return 'ca-app-pub-5335679604691429/6452155798';
+          return 'ca-app-pub-5400203683183472/4853107436';
         case 'parelles':
-          return 'ca-app-pub-5335679604691429/8966638495';
+          return 'ca-app-pub-5400203683183472/2554247152';
         case 'sequence':
-          return 'ca-app-pub-5335679604691429/5139074123';
+          return 'ca-app-pub-5400203683183472/4022584950';
         default:
           return 'ca-app-pub-3940256099942544/1033173712';
       }
     }
     else if (Platform.isIOS) {
-      return 'ca-app-pub-5400203683183472/1576191494'; //
+      return 'ca-app-pub-5400203683183472/1576191494';
     }
     else {
-      return 'ca-app-pub-3940256099942544/4411468910';
+      return 'ca-app-pub-3940256099942544/1033173712';
     }
   }
 }
