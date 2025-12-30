@@ -43,7 +43,7 @@ class AdHelper {
         case 'sequence':
           return 'ca-app-pub-5400203683183472/2925427023';
         default:
-          return 'ca-app-pub-5400203683183472/1576191494';
+          return 'ca-app-pub-5400203683183472/8351113712';
       }
     }
     else {
