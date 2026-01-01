@@ -14,7 +14,6 @@ class _ProfileState extends State<Profile> {
   final TextEditingController _nomController = TextEditingController();
   String _selectedLanguage = 'cat';
 
-  // Estructura per guardar els 3 nivells de cada joc
   Map<String, Map<String, String>> _results = {
     'alphabet': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'number': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
@@ -35,7 +34,6 @@ class _ProfileState extends State<Profile> {
       _selectedLanguage = prefs.getString('language') ?? 'cat';
       _nomController.text = prefs.getString('user_name') ?? '';
 
-      // Carreguem les dades per a cada joc i cada nivell
       _results['alphabet'] = _getAllLevels(prefs, 'time_alphabet');
       _results['number'] = _getAllLevels(prefs, 'time_number');
       _results['operations'] = _getAllLevels(prefs, 'time_operations');
@@ -44,7 +42,6 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  // Funció auxiliar per obtenir els 3 temps d'un prefix
   Map<String, String> _getAllLevels(SharedPreferences prefs, String prefix) {
     return {
       'Facil': _formatMs(prefs.getInt('${prefix}_Facil')),
@@ -78,26 +75,20 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(
-              _selectedLanguage == 'cat' ? 'Perfil' : _selectedLanguage == 'esp' ? 'Perfil' : 'Profile',
-              style: AppStyles.appBarText),
-          centerTitle: true),
+        title: Text(_selectedLanguage == 'cat' ? 'Perfil' : _selectedLanguage == 'esp' ? 'Perfil' : 'Profile', style: AppStyles.appBarText),
+        centerTitle: true
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(15),
         child: Column(
           children: [
             _buildSettingsCard(),
             AppStyles.sizedBoxHeight40,
-            Text(
-                _selectedLanguage == 'cat' ? 'Millors Temps' : _selectedLanguage == 'esp' ? 'Mejores Tiempos' : 'Best Times',
-                style: AppStyles.resultsProfile),
+            Text(_selectedLanguage == 'cat' ? 'Millors Temps' : _selectedLanguage == 'esp' ? 'Mejores Tiempos' : 'Best Times',
+            style: AppStyles.resultsProfile),
             AppStyles.sizedBoxHeight20,
-
-            // CAPÇALERA DE LA TAULA
             _buildTableHeader(),
             const Divider(),
-
-            // FILES DE RESULTATS
             _buildGameRow(_selectedLanguage == 'cat' ? 'Alfabètic' : _selectedLanguage == 'esp' ? 'Alfabético' : 'Alphabet', _results['alphabet']!, Icons.abc_rounded),
             _buildGameRow(_selectedLanguage == 'cat' ? 'Numèric' : _selectedLanguage == 'esp' ? 'Numérico' : 'Numbers', _results['number']!, Icons.onetwothree_rounded),
             _buildGameRow(_selectedLanguage == 'cat' ? 'Operacions' : _selectedLanguage == 'esp' ? 'Operaciones' : 'Operations', _results['operations']!, Icons.calculate_rounded),
@@ -114,10 +105,10 @@ class _ProfileState extends State<Profile> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
       child: Row(
         children: [
-          Expanded(flex: 3, child: Text(_selectedLanguage == 'cat' ? 'Joc' : _selectedLanguage == 'esp' ? 'Juego' : 'Game', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17))),
-          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Fàcil' : _selectedLanguage == 'esp' ? 'Fácil' : 'Easy', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 17))),
-          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Mitjà' : _selectedLanguage == 'esp' ? 'Medio' : 'Medium', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange, fontSize: 17))),
-          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Difícil' : _selectedLanguage == 'esp' ? 'Difícil' : 'Hard', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 17))),
+          Expanded(flex: 4, child: Text(_selectedLanguage == 'cat' ? 'Joc' : _selectedLanguage == 'esp' ? 'Juego' : 'Game', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Fàcil' : _selectedLanguage == 'esp' ? 'Fácil' : 'Easy', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 15))),
+          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Mitjà' : _selectedLanguage == 'esp' ? 'Medio' : 'Medium', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange, fontSize: 15))),
+          Expanded(flex: 2, child: Text(_selectedLanguage == 'cat' ? 'Difícil' : _selectedLanguage == 'esp' ? 'Difícil' : 'Hard', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15))),
         ],
       ),
     );
@@ -132,18 +123,27 @@ class _ProfileState extends State<Profile> {
       child: Row(
         children: [
           Expanded(
-            flex: 3,
+            flex: 4,
             child: Row(
               children: [
-                Icon(icon, size: 20, color: Colors.blueGrey),
-                const SizedBox(width: 8),
-                Expanded(child: Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))),
+                Icon(icon, size: 18, color: Colors.blueGrey),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      name,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          Expanded(flex: 2, child: Text(levels['Facil']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15))),
-          Expanded(flex: 2, child: Text(levels['Mitja']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15))),
-          Expanded(flex: 2, child: Text(levels['Dificil']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15))),
+          Expanded(flex: 2, child: Text(levels['Facil']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14))),
+          Expanded(flex: 2, child: Text(levels['Mitja']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14))),
+          Expanded(flex: 2, child: Text(levels['Dificil']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14))),
         ],
       ),
     );

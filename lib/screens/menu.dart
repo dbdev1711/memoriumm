@@ -75,10 +75,9 @@ class _MenuState extends State<Menu> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Memorium', style: AppStyles.appBarText),
+        title: const Text('Memoriumm', style: AppStyles.appBarText),
         centerTitle: true,
       ),
-      // Hem afegit el SafeArea aquí per protegir tot el contingut del body
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
