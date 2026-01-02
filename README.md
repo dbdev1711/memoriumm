@@ -1,2 +1,1 @@
-# Memoriumm
-Eina d'entrenament mental i millora de la memòria implementada amb Flutter.
+Eina d'entrenament mental per la millora de la memòria implementada amb Flutter.
