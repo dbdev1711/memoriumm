@@ -291,7 +291,7 @@ class _OperationsRecallState extends State<OperationsRecall> {
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         decoration: BoxDecoration(
-                          color: op.isSelected ? Colors.blue.withOpacity(0.1) : Colors.white,
+                          color: op.isSelected ? Colors.blue.withValues(alpha:0.1): Colors.white,
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(
                             color: op.isSelected ? Colors.blue : Colors.grey.shade300,
@@ -299,7 +299,7 @@ class _OperationsRecallState extends State<OperationsRecall> {
                           ),
                           boxShadow: [
                             if (!op.isSelected)
-                              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, offset: const Offset(0, 2))
+                              BoxShadow(color: Colors.black..withValues(alpha:0.05), blurRadius: 5, offset: const Offset(0, 2))
                           ]
                         ),
                         child: Stack(
