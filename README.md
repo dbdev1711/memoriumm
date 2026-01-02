@@ -1,2 +1,2 @@
-# memorium
-Joc per treballar la memòria i l'atenció implementat amb Flutter.
+# Memoriumm
+Eina d'entrenament mental i millora de la memòria implementada amb Flutter.
