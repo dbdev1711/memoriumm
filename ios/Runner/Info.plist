@@ -4,11 +4,11 @@
 <dict>
     <key>GADApplicationIdentifier</key>
     <string>ca-app-pub-5400203683183472~7849137563</string>
+
     <key>NSUserTrackingUsageDescription</key>
     <string>Aquest identificador s'utilitzarà per mostrar-te anuncis personalitzats i millorar la teva experiència de joc.</string>
+
     <key>SKAdNetworkItems</key>
-    <key>NSUserTrackingUsageDescription</key>
-    <string>Aquest identificador s'utilitzarà per mostrar-vos anuncis personalitzats de Google Ads.</string>
     <array>
       <dict>
         <key>SKAdNetworkIdentifier</key>
@@ -151,6 +151,7 @@
         <string>mlmmfzh3r3.skadnetwork</string>
       </dict>
     </array>
+
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
