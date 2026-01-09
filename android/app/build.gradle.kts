@@ -15,7 +15,8 @@ plugins {
 
 android {
     namespace = "db.memorium.memorium"
-    compileSdk = flutter.compileSdkVersion
+    // Forcem a 35 per compatibilitat amb el Gradle Plugin 8.9.1
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     // 2. Configurar la signatura
@@ -39,29 +40,39 @@ android {
 
     defaultConfig {
         applicationId = "db.memorium.memorium"
-        // Forcem minSdk a 21 per evitar el VerifyError en dispositius antics amb AdMob
-        minSdk = flutter.minSdkVersion 
-        targetSdk = flutter.targetSdkVersion
+        // Mínim 21 per suportar les llibreries actuals sense errors de verificació
+        minSdk = 21
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        
-        // Activem MultiDex per gestionar aplicacions amb moltes llibreries (com AdMob)
+
+        // Indispensable per a projectes amb moltes dependències (Firebase, AdMob, Upgrader)
         multiDexEnabled = true
     }
 
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            
-            // Optimització i protecció de codi
+
+            // Optimització per a la botiga
             isMinifyEnabled = true
             isShrinkResources = true
-            
-            // Apliquem el fitxer proguard-rules.pro que has creat
+
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"), 
+                getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+    }
+}
+
+flutter {
+    source = "../.."
+}
+
+dependencies {
+    implementation("androidx.multidex:multidex:2.0.1")
+}            )
         }
     }
 }
