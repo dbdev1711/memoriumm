@@ -1,11 +1,5 @@
 import java.util.Properties
-
-// 1. Llegir el fitxer key.properties
-val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(keystorePropertiesFile.inputStream())
-}
+import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
@@ -15,19 +9,7 @@ plugins {
 
 android {
     namespace = "db.memorium.memorium"
-    // Forcem a 35 per compatibilitat amb el Gradle Plugin 8.9.1
-    compileSdk = 35
-    ndkVersion = flutter.ndkVersion
-
-    // 2. Configurar la signatura
-    signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
-        }
-    }
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -40,28 +22,32 @@ android {
 
     defaultConfig {
         applicationId = "db.memorium.memorium"
-        // Mínim 21 per suportar les llibreries actuals sense errors de verificació
-        minSdk = 21
-        targetSdk = 35
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-
-        // Indispensable per a projectes amb moltes dependències (Firebase, AdMob, Upgrader)
+        minSdk = flutter.minSdkVersion
+        targetSdk = 36
+        versionCode = 18
+        versionName = "1.2.0"
         multiDexEnabled = true
     }
 
+    signingConfigs {
+        create("release") {
+            val keystoreProperties = Properties()
+            val keystorePropertiesFile = rootProject.file("key.properties")
+            if (keystorePropertiesFile.exists()) {
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
-        release {
+        getByName("release") {
             signingConfig = signingConfigs.getByName("release")
-
-            // Optimització per a la botiga
-            isMinifyEnabled = true
-            isShrinkResources = true
-
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
@@ -71,17 +57,34 @@ flutter {
 }
 
 dependencies {
+    // AndroidX i Core Libraries
     implementation("androidx.multidex:multidex:2.0.1")
-}            )
-        }
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.8.7")
+    implementation("androidx.annotation:annotation:1.9.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.core:core-ktx:1.15.0")
+
+    // Configuració de rutes del SDK de Flutter
+    val properties = Properties()
+    val propertiesFile = rootProject.file("local.properties")
+    if (propertiesFile.exists()) {
+        propertiesFile.inputStream().use { properties.load(it) }
     }
-}
+    val flutterSdkPath = properties.getProperty("flutter.sdk") ?: ""
+    
+    // 1. Resolem errors de 'io.flutter' (MainActivity i Registrant)
+    if (flutterSdkPath.isNotEmpty()) {
+        compileOnly(files("$flutterSdkPath/bin/cache/artifacts/engine/android-arm64/flutter.jar"))
+    }
 
-flutter {
-    source = "../.."
-}
-
-dependencies {
-    // Afegim la dependència de MultiDex per a suport en versions antigues d'Android
-    implementation("androidx.multidex:multidex:2.0.1")
+    // 2. Resolem els 7 errors de plugins (Forcem l'enllaç manual)
+    // Això permet que el compilador de Java trobi les classes dels plugins descarregats
+    implementation(project(":google_mobile_ads"))
+    implementation(project(":package_info_plus"))
+    implementation(project(":path_provider_android"))
+    implementation(project(":permission_handler_android"))
+    implementation(project(":shared_preferences_android"))
+    implementation(project(":url_launcher_android"))
+    implementation(project(":webview_flutter_android"))
 }
