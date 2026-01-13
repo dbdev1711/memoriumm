@@ -1,4 +1,3 @@
-// lib/widgets/card.dart
 import 'package:flutter/material.dart';
 import 'dart:math';
 import '../models/card_item.dart';
@@ -9,11 +8,11 @@ class CardWidget extends StatefulWidget {
   final bool isNumberMode;
 
   const CardWidget({
-    Key? key,
+    super.key,
     required this.card,
     required this.onTap,
     this.isNumberMode = false,
-  }) : super(key: key);
+  });
 
   @override
   State<CardWidget> createState() => _CardWidgetState();

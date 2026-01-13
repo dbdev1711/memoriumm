@@ -7,7 +7,7 @@ class PairsLevel extends StatelessWidget {
   final GameMode mode;
   final String language;
 
-  const PairsLevel({Key? key, required this.mode, required this.language}) : super(key: key);
+  const PairsLevel({super.key, required this.mode, required this.language});
 
   List<GameConfig> _getConfigs() {
     return [

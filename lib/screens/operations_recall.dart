@@ -25,18 +25,18 @@ class OperationsRecall extends StatefulWidget {
   final String language;
 
   const OperationsRecall({
-    Key? key,
+    super.key,
     required this.config,
     required this.language,
-  }) : super(key: key);
+  });
 
   @override
   State<OperationsRecall> createState() => _OperationsRecallState();
 }
 
 class _OperationsRecallState extends State<OperationsRecall> {
-  List<OperationModel> _operations = [];
-  List<OperationModel> _userSelection = [];
+  final List<OperationModel> _operations = [];
+  final List<OperationModel> _userSelection = [];
 
   bool _showResultPanel = false;
   String _resultTitle = '';
@@ -186,7 +186,7 @@ class _OperationsRecallState extends State<OperationsRecall> {
     });
   }
 
-  void _checkResult() {
+  Future<void> _checkResult() async {
     List<OperationModel> sorted = List.from(_operations);
     sorted.sort((a, b) => a.result.compareTo(b.result));
 
@@ -231,7 +231,9 @@ class _OperationsRecallState extends State<OperationsRecall> {
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
+    bool canShowAd = await AdHelper.shouldShowAd();
+
+    if (_isAdLoaded && _interstitialAd != null && canShowAd) {
       _interstitialAd!.show().then((_) {
         showResultUI();
         _isAdLoaded = false;

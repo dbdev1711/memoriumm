@@ -7,7 +7,7 @@ class SequenceLevel extends StatelessWidget {
   final GameMode mode;
   final String language;
 
-  const SequenceLevel({Key? key, required this.mode, required this.language}) : super(key: key);
+  const SequenceLevel({super.key, required this.mode, required this.language});
 
   List<GameConfig> _getConfigs() {
     return [

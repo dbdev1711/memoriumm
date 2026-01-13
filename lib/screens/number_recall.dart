@@ -13,7 +13,7 @@ import '../widgets/result_panel.dart';
 class NumberRecall extends StatefulWidget {
   final GameConfig config;
   final String language;
-  const NumberRecall({Key? key, required this.config, required this.language}) : super(key: key);
+  const NumberRecall({super.key, required this.config, required this.language});
   @override
   State<NumberRecall> createState() => _NumberRecallState();
 }
@@ -164,7 +164,9 @@ class _NumberRecallState extends State<NumberRecall> {
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
+    bool canShowAd = await AdHelper.shouldShowAd();
+
+    if (_isAdLoaded && _interstitialAd != null && canShowAd) {
       _interstitialAd!.show().then((_) {
         showResultUI();
         _isAdLoaded = false;
@@ -199,7 +201,7 @@ class _NumberRecallState extends State<NumberRecall> {
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blueGrey),
                 ),
               ),
-        
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -234,7 +236,7 @@ class _NumberRecallState extends State<NumberRecall> {
                 ),
               )
             ),
-        
+
             if (_showResultPanel)
               ResultPanel(
                 title: _resultTitle,

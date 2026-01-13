@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'menu.dart';
 
 class Idioma extends StatelessWidget {
-  const Idioma({Key? key}) : super(key: key);
+  const Idioma({super.key});
 
   Future<void> _selectLanguage(BuildContext context, String langCode) async {
     final prefs = await SharedPreferences.getInstance();

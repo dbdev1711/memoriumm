@@ -14,7 +14,7 @@ class AlphabetRecall extends StatefulWidget {
   final GameConfig config;
   final String language;
 
-  const AlphabetRecall({Key? key, required this.config, required this.language}) : super(key: key);
+  const AlphabetRecall({super.key, required this.config, required this.language});
 
   @override
   State<AlphabetRecall> createState() => _AlphabetRecallState();
@@ -172,12 +172,14 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
           _resultMessage = (widget.language == 'cat' ? 'Lletres ordenades!' : widget.language == 'esp' ? '¡Letras ordenadas!' : 'Letters sorted!') + timeStr;
         } else {
           _resultTitle = '❌ Error!';
-          _resultMessage = (widget.language == 'cat' ? 'Era la lletra' : widget.language == 'esp' ? 'Era la letra' : 'It was letter') + ' $_currentLetter';
+          _resultMessage = '${widget.language == 'cat' ? 'Era la lletra' : widget.language == 'esp' ? 'Era la letra' : 'It was letter'} $_currentLetter';
         }
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
+    bool canShowAd = await AdHelper.shouldShowAd();
+
+    if (_isAdLoaded && _interstitialAd != null && canShowAd) {
       _interstitialAd!.show().then((_) {
         showResultUI();
         _isAdLoaded = false;
@@ -226,9 +228,7 @@ class _AlphabetRecallState extends State<AlphabetRecall> {
                   builder: (context, constraints) {
                     final double width = constraints.maxWidth;
                     final double height = constraints.maxHeight;
-                    
-                    // Millora de càlcul: restem els espais buits (10px per cada separació) 
-                    // i un marge extra de 12px per seguretat.
+
                     const double spacing = 10.0;
                     final double totalVerticalSpacing = spacing * (widget.config.rows - 1);
                     final double totalHorizontalSpacing = spacing * (widget.config.columns - 1);

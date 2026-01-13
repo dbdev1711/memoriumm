@@ -10,7 +10,7 @@ import 'alphabet_level.dart';
 import 'profile.dart';
 
 class Menu extends StatefulWidget {
-  const Menu({Key? key}) : super(key: key);
+  const Menu({super.key});
 
   @override
   State<Menu> createState() => _MenuState();
@@ -83,18 +83,16 @@ class _MenuState extends State<Menu> {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                AppStyles.sizedBoxHeight40,
+                const SizedBox(height: 20),
                 ...GameMode.values.map((mode) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
                     child: ElevatedButton(
                       onPressed: () => _navigateToModeSelection(context, mode),
                       style: ElevatedButton.styleFrom(
-                        fixedSize: Size(MediaQuery.of(context).size.width * 0.85, 100),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        minimumSize: Size(MediaQuery.of(context).size.width * 0.9, 110),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -103,33 +101,31 @@ class _MenuState extends State<Menu> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              mode.getTitle(_currentLang),
-                              style: AppStyles.menuButtonTitle,
-                              textAlign: TextAlign.center,
+                          Text(
+                            mode.getTitle(_currentLang),
+                            style: const TextStyle(
+                              fontSize: 24, // Text del títol més gran
+                              fontWeight: FontWeight.bold,
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 4),
-                          Expanded(
-                            child: Center(
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  mode.getDescription(_currentLang),
-                                  style: AppStyles.menuButtonDesc,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 2,
-                                ),
-                              ),
+                          const SizedBox(height: 8),
+                          Text(
+                            mode.getDescription(_currentLang),
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white70,
                             ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
                     ),
                   );
-                }).toList(),
+                }),
                 const SizedBox(height: 30),
               ],
             ),

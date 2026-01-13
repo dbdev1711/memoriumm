@@ -15,18 +15,18 @@ class PairsRecall extends StatefulWidget {
   final String language;
 
   const PairsRecall({
-    Key? key,
+    super.key,
     required this.config,
     required this.language,
-  }) : super(key: key);
+  });
 
   @override
   State<PairsRecall> createState() => _PairsRecallState();
 }
 
 class _PairsRecallState extends State<PairsRecall> {
-  List<CardItem> _cards = [];
-  List<CardItem> _flippedCards = [];
+  final List<CardItem> _cards = [];
+  final List<CardItem> _flippedCards = [];
   int _matchesFound = 0;
   int _totalPairsNeeded = 0;
   bool _showResultPanel = false;
@@ -188,7 +188,7 @@ class _PairsRecallState extends State<PairsRecall> {
     }
   }
 
-  void _showGamePanel({required bool win}) {
+  Future<void> _showGamePanel({required bool win}) async {
     if (win) {
       _stopwatch.stop();
       _saveStats(_stopwatch.elapsedMilliseconds);
@@ -213,7 +213,9 @@ class _PairsRecallState extends State<PairsRecall> {
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
+    bool canShowAd = await AdHelper.shouldShowAd();
+
+    if (_isAdLoaded && _interstitialAd != null && canShowAd) {
       _interstitialAd!.show().then((_) {
         displayResult();
         _isAdLoaded = false;
@@ -247,18 +249,15 @@ class _PairsRecallState extends State<PairsRecall> {
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  // Càlcul precís d'espais
                   const double gridPadding = 12.0;
                   const double gridSpacing = 8.0;
-                  
-                  final double width = constraints.maxWidth - (gridPadding * 2); 
-                  final double height = constraints.maxHeight - (gridPadding * 2); 
 
-                  // Restem l'espai que ocupen els "gaps" horitzontals i verticals
+                  final double width = constraints.maxWidth - (gridPadding * 2);
+                  final double height = constraints.maxHeight - (gridPadding * 2);
+
                   final double totalHorizontalSpacing = gridSpacing * (widget.config.columns - 1);
                   final double totalVerticalSpacing = gridSpacing * (widget.config.rows - 1);
 
-                  // Calculem la mida de la cel·la neta, afegint -12px de seguretat vertical
                   final double cellWidth = (width - totalHorizontalSpacing) / widget.config.columns;
                   final double cellHeight = (height - totalVerticalSpacing - 12) / widget.config.rows;
 
@@ -273,19 +272,19 @@ class _PairsRecallState extends State<PairsRecall> {
                     ),
                     itemCount: _cards.length,
                     itemBuilder: (context, index) => CardWidget(
-                      card: _cards[index], 
+                      card: _cards[index],
                       onTap: () => _handleCardTap(_cards[index])
                     ),
                   );
                 },
               ),
             ),
-            if (_showResultPanel) 
+            if (_showResultPanel)
               ResultPanel(
-                title: _resultTitle, 
-                message: _resultMessage, 
-                color: _resultColor, 
-                onRestart: _initializeGame, 
+                title: _resultTitle,
+                message: _resultMessage,
+                color: _resultColor,
+                onRestart: _initializeGame,
                 language: widget.language
               ),
           ],

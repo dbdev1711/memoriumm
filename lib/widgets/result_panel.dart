@@ -11,14 +11,14 @@ class ResultPanel extends StatelessWidget {
   final String language;
 
   const ResultPanel({
-    Key? key,
+    super.key,
     required this.title,
     required this.message,
     required this.color,
     required this.onRestart,
     required this.language,
     this.onBackToLevels,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -7,7 +7,7 @@ class AlphabetLevel extends StatelessWidget {
   final GameMode mode;
   final String language;
 
-  const AlphabetLevel({Key? key, required this.mode, required this.language}) : super(key: key);
+  const AlphabetLevel({super.key, required this.mode, required this.language});
 
   List<GameConfig> _getConfigs() {
     return [

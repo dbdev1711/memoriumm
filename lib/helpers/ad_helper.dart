@@ -1,16 +1,30 @@
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdHelper {
-  static int _gameCounter = 0;
-  static const int adFrequency = 4;
+  // Clau constant per a la memòria
+  static const String _kGameCounterKey = 'game_counter_persistent';
+  // Nova freqüència de 7 jocs
+  static const int adFrequency = 7;
 
-  static bool shouldShowAd() {
-    _gameCounter++;
-    if (_gameCounter >= adFrequency) {
-      _gameCounter = 0;
+  /// Ara és asíncron per poder llegir de SharedPreferences
+  static Future<bool> shouldShowAd() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Obtenim el valor guardat (si no existeix, és 0)
+    int currentCounter = prefs.getInt(_kGameCounterKey) ?? 0;
+
+    currentCounter++;
+
+    if (currentCounter >= adFrequency) {
+      // Reiniciem el comptador a la memòria i retornem true
+      await prefs.setInt(_kGameCounterKey, 0);
       return true;
+    } else {
+      // Guardem el nou valor i retornem false
+      await prefs.setInt(_kGameCounterKey, currentCounter);
+      return false;
     }
-    return false;
   }
 
   static String getInterstitialAdId(String gameType) {
@@ -29,8 +43,7 @@ class AdHelper {
         default:
           return 'ca-app-pub-3940256099942544/1033173712';
       }
-    }
-    else if (Platform.isIOS) {
+    } else if (Platform.isIOS) {
       switch (gameType) {
         case 'alphabet':
           return 'ca-app-pub-5400203683183472/3667663051';
@@ -45,8 +58,7 @@ class AdHelper {
         default:
           return 'ca-app-pub-5400203683183472/8351113712';
       }
-    }
-    else {
+    } else {
       return 'ca-app-pub-3940256099942544/1033173712';
     }
   }

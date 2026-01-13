@@ -7,7 +7,7 @@ class NumberLevel extends StatelessWidget {
   final GameMode mode;
   final String language;
 
-  const NumberLevel({Key? key, required this.mode, required this.language}) : super(key: key);
+  const NumberLevel({super.key, required this.mode, required this.language});
 
   List<GameConfig> _getConfigs() {
     return [

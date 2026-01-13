@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../styles/app_styles.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({Key? key, required this.language}) : super(key: key);
+  const Profile({super.key, required this.language});
   final String language;
 
   @override
@@ -14,7 +14,7 @@ class _ProfileState extends State<Profile> {
   final TextEditingController _nomController = TextEditingController();
   String _selectedLanguage = 'cat';
 
-  Map<String, Map<String, String>> _results = {
+  final Map<String, Map<String, String>> _results = {
     'alphabet': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'number': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'operations': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},

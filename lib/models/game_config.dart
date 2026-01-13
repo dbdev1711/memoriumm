@@ -1,5 +1,3 @@
-// lib/models/game_config.dart
-
 enum GameMode {
   classicMatch,
   sequenceRecall,
@@ -8,7 +6,6 @@ enum GameMode {
   alphabetRecall,
   profile;
 
-  // Diccionari de títols per idioma
   static const Map<GameMode, Map<String, String>> _titles = {
     GameMode.classicMatch: {
       'cat': 'Parelles',
@@ -42,32 +39,31 @@ enum GameMode {
     },
   };
 
-  // Diccionari de descripcions per idioma
   static const Map<GameMode, Map<String, String>> _descriptions = {
     GameMode.classicMatch: {
-      'cat': 'Troba totes les parelles iguals',
-      'esp': 'Encuentra todas las parejas iguales',
-      'eng': 'Find all the matching pairs',
+      'cat': 'Troba totes les parelles',
+      'esp': 'Encuentra todas las parejas',
+      'eng': 'Get all the pairs',
     },
     GameMode.sequenceRecall: {
-      'cat': 'Repeteix l\'ordre correcte',
-      'esp': 'Repite el orden correcto',
-      'eng': 'Repeat the correct order',
+      'cat': 'Repeteix l\'ordre',
+      'esp': 'Repite el orden',
+      'eng': 'Repeat the order',
     },
     GameMode.numberRecall: {
-      'cat': 'Recorda els números per ordre',
-      'esp': 'Recuerda los números por orden',
-      'eng': 'Remember numbers in order',
+      'cat': 'Recorda els números',
+      'esp': 'Recuerda los números',
+      'eng': 'Remember the numbers',
     },
     GameMode.operations: {
-      'cat': 'Calcula i ordena ascendentment',
-      'esp': 'Calcula y ordena ascendentemente',
-      'eng': 'Calculate and sort ascending',
+      'cat': 'Calcula i ordena',
+      'esp': 'Calcula y ordena',
+      'eng': 'Calculate and sort',
     },
     GameMode.alphabetRecall: {
-      'cat': 'Recorda les lletres per ordre',
-      'esp': 'Recuerda las letras por orden',
-      'eng': 'Remember letters in order',
+      'cat': 'Recorda les lletres',
+      'esp': 'Recuerda las letras',
+      'eng': 'Remember the letters',
     },
     GameMode.profile: {
       'cat': 'Configuració i resultats',
@@ -76,7 +72,6 @@ enum GameMode {
     },
   };
 
-  // Mètodes auxiliars per obtenir el text segons l'idioma actiu
   String getTitle(String lang) => _titles[this]?[lang] ?? _titles[this]?['eng'] ?? '';
   String getDescription(String lang) => _descriptions[this]?[lang] ?? _descriptions[this]?['eng'] ?? '';
 }

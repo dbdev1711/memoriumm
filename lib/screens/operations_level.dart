@@ -7,7 +7,7 @@ class OperationsLevel extends StatelessWidget {
   final GameMode mode;
   final String language;
 
-  const OperationsLevel({Key? key, required this.mode, required this.language}) : super(key: key);
+  const OperationsLevel({super.key, required this.mode, required this.language});
 
   List<GameConfig> _getConfigs() {
     return [

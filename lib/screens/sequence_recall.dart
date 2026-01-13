@@ -14,14 +14,14 @@ class SequenceRecall extends StatefulWidget {
   final GameConfig config;
   final String language;
 
-  const SequenceRecall({Key? key, required this.config, required this.language}) : super(key: key);
+  const SequenceRecall({super.key, required this.config, required this.language});
 
   @override
   State<SequenceRecall> createState() => _SequenceRecallState();
 }
 
 class _SequenceRecallState extends State<SequenceRecall> {
-  List<CardItem> _cards = [];
+  final List<CardItem> _cards = [];
   List<CardItem> _sequence = [];
   int _sequenceStep = 0;
   bool _isChecking = false;
@@ -193,7 +193,9 @@ class _SequenceRecallState extends State<SequenceRecall> {
       });
     }
 
-    if (_isAdLoaded && _interstitialAd != null && AdHelper.shouldShowAd()) {
+    bool canShowAd = await AdHelper.shouldShowAd();
+
+    if (_isAdLoaded && _interstitialAd != null && canShowAd) {
       _interstitialAd!.show().then((_) {
         displayResultUI();
         _isAdLoaded = false;
