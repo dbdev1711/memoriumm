@@ -104,18 +104,18 @@ class _MenuState extends State<Menu> {
                           Text(
                             mode.getTitle(_currentLang),
                             style: const TextStyle(
-                              fontSize: 24, // Text del títol més gran
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           Text(
                             mode.getDescription(_currentLang),
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w400,
-                              color: Colors.white70,
+                              color: Colors.white,
                             ),
                             textAlign: TextAlign.center,
                             maxLines: 2,
