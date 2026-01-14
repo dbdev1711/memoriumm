@@ -2,26 +2,18 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AdHelper {
-  // Clau constant per a la memòria
   static const String _kGameCounterKey = 'game_counter_persistent';
-  // Nova freqüència de 7 jocs
   static const int adFrequency = 7;
 
-  /// Ara és asíncron per poder llegir de SharedPreferences
   static Future<bool> shouldShowAd() async {
     final prefs = await SharedPreferences.getInstance();
-
-    // Obtenim el valor guardat (si no existeix, és 0)
     int currentCounter = prefs.getInt(_kGameCounterKey) ?? 0;
-
     currentCounter++;
 
     if (currentCounter >= adFrequency) {
-      // Reiniciem el comptador a la memòria i retornem true
       await prefs.setInt(_kGameCounterKey, 0);
       return true;
     } else {
-      // Guardem el nou valor i retornem false
       await prefs.setInt(_kGameCounterKey, currentCounter);
       return false;
     }
@@ -31,17 +23,17 @@ class AdHelper {
     if (Platform.isAndroid) {
       switch (gameType) {
         case 'alphabet':
-          return 'ca-app-pub-5400203683183472/7703450299';
+          return 'ca-app-pub-5400203683183472/9505402967';
         case 'numbers':
-          return 'ca-app-pub-5400203683183472/1161274431';
+          return 'ca-app-pub-5400203683183472/8411813144';
         case 'operations':
-          return 'ca-app-pub-5400203683183472/4853107436';
+          return 'ca-app-pub-5400203683183472/8284670697';
         case 'parelles':
-          return 'ca-app-pub-5400203683183472/2554247152';
+          return 'ca-app-pub-5400203683183472/7084281429';
         case 'sequence':
-          return 'ca-app-pub-5400203683183472/4022584950';
+          return 'ca-app-pub-5400203683183472/5139632606';
         default:
-          return 'ca-app-pub-3940256099942544/1033173712';
+          return 'ca-app-pub-5400203683183472/9505402967';
       }
     } else if (Platform.isIOS) {
       switch (gameType) {

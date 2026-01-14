@@ -150,6 +150,7 @@
         <key>SKAdNetworkIdentifier</key>
         <string>mlmmfzh3r3.skadnetwork</string>
       </dict>
+      <key>ITSAppUsesNonExemptEncryption</key>
     </array>
 
     <key>CFBundleDevelopmentRegion</key>
