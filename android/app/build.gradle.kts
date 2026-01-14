@@ -11,6 +11,16 @@ android {
     namespace = "db.memorium.memorium"
     compileSdk = 36
 
+    // Solució per al conflicte de llibres natives duplicades
+    packaging {
+        resources {
+            pickFirsts.add("lib/arm64-v8a/libflutter.so")
+            pickFirsts.add("lib/armeabi-v7a/libflutter.so")
+            pickFirsts.add("lib/x86_64/libflutter.so")
+            pickFirsts.add("lib/x86/libflutter.so")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -63,18 +73,7 @@ dependencies {
     implementation("androidx.annotation:annotation:1.9.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.core:core-ktx:1.15.0")
-
-    // Aquest bloc és el que necessita per trobar 'io.flutter' i 'FlutterActivity'
-    val properties = Properties()
-    val propertiesFile = rootProject.file("local.properties")
-    if (propertiesFile.exists()) {
-        propertiesFile.inputStream().use { properties.load(it) }
-    }
-    val flutterSdkPath = properties.getProperty("flutter.sdk") ?: ""
     
-    if (flutterSdkPath.isNotEmpty()) {
-        // Això soluciona els errors de "package io.flutter... does not exist"
-        compileOnly(files("$flutterSdkPath/bin/cache/artifacts/engine/android-arm64/flutter.jar"))
-        implementation(files("$flutterSdkPath/bin/cache/artifacts/engine/android-arm64/flutter.jar"))
-    }
+    // El plugin de Flutter ja gestiona les dependències del motor automàticament.
+    // No cal afegir el flutter.jar manualment aquí.
 }
