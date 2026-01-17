@@ -21,7 +21,6 @@ void main() async {
   final String savedLang = prefs.getString('language') ?? 'cat';
 
   await _initTracking();
-
   await MobileAds.instance.initialize();
 
   runApp(App(isFirstRun: isFirstRun, savedLang: savedLang));
@@ -41,6 +40,7 @@ class App extends StatelessWidget {
 
   const App({super.key, required this.isFirstRun, required this.savedLang});
 
+  // Mapeig de l'idioma intern de l'app al codi ISO d'Upgrader [cite: 2025-12-30]
   String _getUpgraderCode() {
     switch (savedLang) {
       case 'esp':
@@ -50,6 +50,18 @@ class App extends StatelessWidget {
       case 'cat':
       default:
         return 'ca';
+    }
+  }
+
+  UpgraderMessages _getUpgraderMessages(String code) {
+    switch (code) {
+      case 'es':
+        return SpanishMessages();
+      case 'en':
+        return EnglishMessages();
+      case 'ca':
+      default:
+        return CatalaMessages();
     }
   }
 
@@ -64,11 +76,36 @@ class App extends StatelessWidget {
       home: UpgradeAlert(
         upgrader: Upgrader(
           languageCode: langCode,
-          messages: UpgraderMessages(code: langCode),
+          messages: _getUpgraderMessages(langCode),
           durationUntilAlertAgain: const Duration(days: 1),
         ),
         child: isFirstRun ? const Idioma() : const Menu(),
       ),
     );
   }
+}
+
+// UPGRADER
+class CatalaMessages extends UpgraderMessages {
+  CatalaMessages() : super(code: 'ca');
+  @override String get body => 'Hi ha una nova versió de Memoriumm disponible.';
+  @override String get title => 'Actualització disponible';
+  @override String get prompt => 'Vols actualitzar ara?';
+  @override String get releaseNotes => 'Notes de la versió:';
+}
+
+class SpanishMessages extends UpgraderMessages {
+  SpanishMessages() : super(code: 'es');
+  @override String get body => 'Hay una nueva versión de Memoriumm disponible.';
+  @override String get title => 'Actualización disponible';
+  @override String get prompt => '¿Quieres actualizar ahora?';
+  @override String get releaseNotes => 'Notas de la versión:';
+}
+
+class EnglishMessages extends UpgraderMessages {
+  EnglishMessages() : super(code: 'en');
+  @override String get body => 'A new version of Memoriumm is available.';
+  @override String get title => 'Update Available';
+  @override String get prompt => 'Would you like to update now?';
+  @override String get releaseNotes => 'Release Notes:';
 }
