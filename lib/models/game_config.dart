@@ -3,7 +3,7 @@ enum GameMode {
   sequenceRecall,
   numberRecall,
   operations,
-  alphabetRecall,
+  //alphabetRecall,
   profile;
 
   static const Map<GameMode, Map<String, String>> _titles = {
@@ -27,11 +27,11 @@ enum GameMode {
       'esp': 'Operaciones',
       'eng': 'Operations',
     },
-    GameMode.alphabetRecall: {
+    /*GameMode.alphabetRecall: {
       'cat': 'Alfabètic',
       'esp': 'Alfabético',
       'eng': 'Alphabet',
-    },
+    },*/
     GameMode.profile: {
       'cat': 'Perfil',
       'esp': 'Perfil',
@@ -60,11 +60,11 @@ enum GameMode {
       'esp': 'Calcula y ordena',
       'eng': 'Calculate and sort',
     },
-    GameMode.alphabetRecall: {
+    /*GameMode.alphabetRecall: {
       'cat': 'Recorda les lletres',
       'esp': 'Recuerda las letras',
       'eng': 'Remember the letters',
-    },
+    },*/
     GameMode.profile: {
       'cat': 'Configuració i resultats',
       'esp': 'Configuración y resultados',

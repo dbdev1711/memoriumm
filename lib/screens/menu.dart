@@ -6,7 +6,7 @@ import 'operations_level.dart';
 import 'pairs_level.dart';
 import 'sequence_level.dart';
 import 'number_level.dart';
-import 'alphabet_level.dart';
+//import 'alphabet_level.dart';
 import 'profile.dart';
 
 class Menu extends StatefulWidget {
@@ -47,9 +47,9 @@ class _MenuState extends State<Menu> {
       case GameMode.numberRecall:
         targetScreen = NumberLevel(mode: mode, language: _currentLang);
         break;
-      case GameMode.alphabetRecall:
+      /*case GameMode.alphabetRecall:
         targetScreen = AlphabetLevel(mode: mode, language: _currentLang);
-        break;
+        break;*/
       case GameMode.operations:
         targetScreen = OperationsLevel(mode: mode, language: _currentLang);
         break;
