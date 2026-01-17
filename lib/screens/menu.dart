@@ -6,7 +6,6 @@ import 'operations_level.dart';
 import 'pairs_level.dart';
 import 'sequence_level.dart';
 import 'number_level.dart';
-//import 'alphabet_level.dart';
 import 'profile.dart';
 
 class Menu extends StatefulWidget {
@@ -47,15 +46,14 @@ class _MenuState extends State<Menu> {
       case GameMode.numberRecall:
         targetScreen = NumberLevel(mode: mode, language: _currentLang);
         break;
-      /*case GameMode.alphabetRecall:
-        targetScreen = AlphabetLevel(mode: mode, language: _currentLang);
-        break;*/
       case GameMode.operations:
         targetScreen = OperationsLevel(mode: mode, language: _currentLang);
         break;
       case GameMode.profile:
         targetScreen = Profile(language: _currentLang);
         break;
+      default:
+        return;
     }
 
     Navigator.push(
@@ -71,6 +69,9 @@ class _MenuState extends State<Menu> {
     if (_isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
+    final modes = GameMode.values.where((m) => m.name != 'alphabetRecall').toList();
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -78,56 +79,61 @@ class _MenuState extends State<Menu> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
+        child: MediaQuery(
+          // Forcem que la mida del text ignori la configuració del sistema
+          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
             child: Column(
-              children: [
-                const SizedBox(height: 20),
-                ...GameMode.values.map((mode) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
-                    child: ElevatedButton(
-                      onPressed: () => _navigateToModeSelection(context, mode),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(MediaQuery.of(context).size.width * 0.9, 110),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
+              children: modes.map((mode) {
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => _navigateToModeSelection(context, mode),
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 4,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                         ),
-                        elevation: 4,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            mode.getTitle(_currentLang),
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                mode.getTitle(_currentLang),
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            mode.getDescription(_currentLang),
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white,
+                            const SizedBox(height: 4),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                mode.getDescription(_currentLang),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                              ),
                             ),
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  );
-                }),
-                const SizedBox(height: 30),
-              ],
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ),

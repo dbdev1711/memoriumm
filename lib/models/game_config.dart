@@ -41,9 +41,9 @@ enum GameMode {
 
   static const Map<GameMode, Map<String, String>> _descriptions = {
     GameMode.classicMatch: {
-      'cat': 'Troba totes les parelles',
-      'esp': 'Encuentra todas las parejas',
-      'eng': 'Get all the pairs',
+      'cat': 'Troba les parelles',
+      'esp': 'Encuentra las parejas',
+      'eng': 'Get the pairs',
     },
     GameMode.sequenceRecall: {
       'cat': 'Repeteix l\'ordre',

@@ -15,7 +15,7 @@ class _ProfileState extends State<Profile> {
   String _selectedLanguage = 'cat';
 
   final Map<String, Map<String, String>> _results = {
-    'alphabet': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
+    //'alphabet': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'number': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'operations': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'parelles': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
@@ -34,7 +34,7 @@ class _ProfileState extends State<Profile> {
       _selectedLanguage = prefs.getString('language') ?? 'cat';
       _nomController.text = prefs.getString('user_name') ?? '';
 
-      _results['alphabet'] = _getAllLevels(prefs, 'time_alphabet');
+      //_results['alphabet'] = _getAllLevels(prefs, 'time_alphabet');
       _results['number'] = _getAllLevels(prefs, 'time_number');
       _results['operations'] = _getAllLevels(prefs, 'time_operations');
       _results['parelles'] = _getAllLevels(prefs, 'time_parelles');
@@ -88,7 +88,7 @@ class _ProfileState extends State<Profile> {
             AppStyles.sizedBoxHeight20,
             _buildTableHeader(),
             const Divider(),
-            _buildGameRow(_selectedLanguage == 'cat' ? 'Alfabètic' : _selectedLanguage == 'esp' ? 'Alfabético' : 'Alphabet', _results['alphabet']!, Icons.abc_rounded),
+            //_buildGameRow(_selectedLanguage == 'cat' ? 'Alfabètic' : _selectedLanguage == 'esp' ? 'Alfabético' : 'Alphabet', _results['alphabet']!, Icons.abc_rounded),
             _buildGameRow(_selectedLanguage == 'cat' ? 'Numèric' : _selectedLanguage == 'esp' ? 'Numérico' : 'Numbers', _results['number']!, Icons.onetwothree_rounded),
             _buildGameRow(_selectedLanguage == 'cat' ? 'Operacions' : _selectedLanguage == 'esp' ? 'Operaciones' : 'Operations', _results['operations']!, Icons.calculate_rounded),
             _buildGameRow(_selectedLanguage == 'cat' ? 'Parelles' : _selectedLanguage == 'esp' ? 'Parejas' : 'Pairs', _results['parelles']!, Icons.grid_view_rounded),
