@@ -182,6 +182,13 @@ class _SequenceRecallState extends State<SequenceRecall> {
         _showResultPanel = true;
         _resultColor = win ? Colors.green : Colors.red;
 
+        // Revela les cartes de la seqüència al finalitzar
+        for (int i = 0; i < _cards.length; i++) {
+          if (_cards[i].content == '🔴') {
+            _cards[i] = _cards[i].copyWith(isFlipped: true);
+          }
+        }
+
         _resultTitle = win
             ? (widget.language == 'cat' ? '🏆 Correcte!' : widget.language == 'esp' ? '🏆 ¡Correcto!' : '🏆 Correct!')
             : '❌ Error!';
@@ -217,7 +224,7 @@ class _SequenceRecallState extends State<SequenceRecall> {
         child: Column(children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: _isChecking
+            child: _isChecking && !_showResultPanel
                 ? AppStyles.sizedBoxHeight70
                 : Column(children: [
                     Text(widget.language == 'cat' ? 'Repeteix la seqüència' : widget.language == 'esp' ? 'Repite la secuencia' : 'Repeat the sequence', style: const TextStyle(fontSize: 18)),
