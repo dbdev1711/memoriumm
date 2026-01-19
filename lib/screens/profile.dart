@@ -15,7 +15,6 @@ class _ProfileState extends State<Profile> {
   String _selectedLanguage = 'cat';
 
   final Map<String, Map<String, String>> _results = {
-    //'alphabet': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'number': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'operations': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
     'parelles': {'Facil': '-', 'Mitja': '-', 'Dificil': '-'},
@@ -33,8 +32,6 @@ class _ProfileState extends State<Profile> {
     setState(() {
       _selectedLanguage = prefs.getString('language') ?? 'cat';
       _nomController.text = prefs.getString('user_name') ?? '';
-
-      //_results['alphabet'] = _getAllLevels(prefs, 'time_alphabet');
       _results['number'] = _getAllLevels(prefs, 'time_number');
       _results['operations'] = _getAllLevels(prefs, 'time_operations');
       _results['parelles'] = _getAllLevels(prefs, 'time_parelles');
@@ -66,15 +63,22 @@ class _ProfileState extends State<Profile> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Colors.lightBlue,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        content: Text(
-            _selectedLanguage == 'cat' ? 'Guardat!' : _selectedLanguage == 'esp' ? '¡Guardado!' : 'Saved!',
-            style: AppStyles.profileSnackBar)));
+        content: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+              _selectedLanguage == 'cat' ? 'Guardat!' : _selectedLanguage == 'esp' ? '¡Guardado!' : 'Saved!',
+              style: AppStyles.profileSnackBar),
+        )));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_selectedLanguage == 'cat' ? 'Perfil' : _selectedLanguage == 'esp' ? 'Perfil' : 'Profile', style: AppStyles.appBarText),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(_selectedLanguage == 'cat' ? 'Perfil' : _selectedLanguage == 'esp' ? 'Perfil' : 'Profile', style: AppStyles.appBarText),
+        ),
         centerTitle: true
       ),
       body: SingleChildScrollView(
@@ -83,12 +87,13 @@ class _ProfileState extends State<Profile> {
           children: [
             _buildSettingsCard(),
             AppStyles.sizedBoxHeight40,
-            Text(_selectedLanguage == 'cat' ? 'Millors Temps' : _selectedLanguage == 'esp' ? 'Mejores Tiempos' : 'Best Times',
-            style: AppStyles.resultsProfile),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(_selectedLanguage == 'cat' ? 'Millors Temps' : _selectedLanguage == 'esp' ? 'Mejores Tiempos' : 'Best Times',style: AppStyles.resultsProfile),
+            ),
             AppStyles.sizedBoxHeight20,
             _buildTableHeader(),
             const Divider(),
-            //_buildGameRow(_selectedLanguage == 'cat' ? 'Alfabètic' : _selectedLanguage == 'esp' ? 'Alfabético' : 'Alphabet', _results['alphabet']!, Icons.abc_rounded),
             _buildGameRow(_selectedLanguage == 'cat' ? 'Numèric' : _selectedLanguage == 'esp' ? 'Numérico' : 'Numbers', _results['number']!, Icons.onetwothree_rounded),
             _buildGameRow(_selectedLanguage == 'cat' ? 'Operacions' : _selectedLanguage == 'esp' ? 'Operaciones' : 'Operations', _results['operations']!, Icons.calculate_rounded),
             _buildGameRow(_selectedLanguage == 'cat' ? 'Parelles' : _selectedLanguage == 'esp' ? 'Parejas' : 'Pairs', _results['parelles']!, Icons.grid_view_rounded),
@@ -98,12 +103,13 @@ class _ProfileState extends State<Profile> {
       ),
     );
   }
+
   Widget _buildTableHeader() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
       child: Row(
         children: [
-          Expanded(flex: 4, child: Text(_selectedLanguage == 'cat' ? 'Joc' : _selectedLanguage == 'esp' ? 'Juego' : 'Game', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15))),
+          Expanded(flex: 4, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(_selectedLanguage == 'cat' ? 'Joc' : _selectedLanguage == 'esp' ? 'Juego' : 'Game', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)))),
           Expanded(flex: 2, child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(_selectedLanguage == 'cat' ? 'Fàcil' : _selectedLanguage == 'esp' ? 'Fácil' : 'Easy', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 15))))),
           Expanded(flex: 2, child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(_selectedLanguage == 'cat' ? 'Mitjà' : _selectedLanguage == 'esp' ? 'Medio' : 'Medium', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange, fontSize: 15))))),
           Expanded(flex: 2, child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(_selectedLanguage == 'cat' ? 'Difícil' : _selectedLanguage == 'esp' ? 'Difícil' : 'Hard', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 15))))),
@@ -111,6 +117,7 @@ class _ProfileState extends State<Profile> {
       ),
     );
   }
+
   Widget _buildGameRow(String name, Map<String, String> levels, IconData icon) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
@@ -125,26 +132,18 @@ class _ProfileState extends State<Profile> {
               children: [
                 Icon(icon, size: 18, color: Colors.blueGrey),
                 const SizedBox(width: 6),
-                Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      name,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)
-                    ),
-                  ),
-                ),
+                Expanded(child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(name, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)))),
               ],
             ),
           ),
-          Expanded(flex: 2, child: Text(levels['Facil']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14))),
-          Expanded(flex: 2, child: Text(levels['Mitja']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14))),
-          Expanded(flex: 2, child: Text(levels['Dificil']!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14))),
+          Expanded(flex: 2, child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(levels['Facil']!, style: const TextStyle(fontSize: 14))))),
+          Expanded(flex: 2, child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(levels['Mitja']!, style: const TextStyle(fontSize: 14))))),
+          Expanded(flex: 2, child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(levels['Dificil']!, style: const TextStyle(fontSize: 14))))),
         ],
       ),
     );
   }
+
   Widget _buildSettingsCard() {
     return Card(
       elevation: 4,
@@ -176,10 +175,20 @@ class _ProfileState extends State<Profile> {
               onChanged: (val) => setState(() => _selectedLanguage = val!),
             ),
             AppStyles.sizedBoxHeight20,
-            ElevatedButton(
-              onPressed: _saveSettings,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
-              child: Text(_selectedLanguage == 'cat' ? 'Guardar' : _selectedLanguage == 'esp' ? 'Guardar' : 'Save'),
+            SizedBox(
+              width: 150,
+              child: ElevatedButton(
+                onPressed: _saveSettings,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(_selectedLanguage == 'cat' ? 'Guardar' : _selectedLanguage == 'esp' ? 'Guardar' : 'Save'),
+                ),
+              ),
             ),
           ],
         ),

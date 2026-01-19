@@ -41,11 +41,32 @@ class _PairsRecallState extends State<PairsRecall> {
   final Stopwatch _stopwatch = Stopwatch();
   final Duration _flipDelay = const Duration(milliseconds: 600);
 
-  final List<String> _baseCardContents = const [
+  final List<String> _cardsEmojis = const [
+    // ANIMALS
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+    '🦁', '🐯', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤',
+    '🐙', '🦑', '🦋', '🐢', '🐍', '🦖', '🐬', '🐝',
+
+    /*
+    // MENJAR
     '🍎', '🍊', '🍇', '🍉', '🍓', '🥝', '🍍', '🥭',
-    '🍒', '🥥', '🥑', '🥦', '🌶️', '🌽', '🍄', '🍆',
-    '🧅', '🥔', '🥕', '🫑', '🥒', '🥜', '🌰', '🍞',
-    '🥐', '🍕', '🌮', '🍔', '🍟', '🧀', '🥚', '🥓',
+    '🍒', '🥑', '🥦', '🌽', '🍄', '🍆', '🍕', '🍔',
+    '🍟', '🧀', '🥚', '🥓', '🍲', '🍜', '🍣', '🍦',
+
+    // ESPORTS I LLEURE
+    '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱',
+    '🏓', '🏸', '🏒', '⛳', '🪁', '🏹', '🎣', '🤿',
+    '🎨', '🎭', '🎤', '🎧', '🎸', '🎹', '🎮', '🎲',
+
+    // VIATGES I VEHICLES
+    '🚗', '🚕', '🚙', '🚌', '🏎️', '🚓', '🚑', '🚒',
+    '🚀', '🛸', '🚁', '⛵', '🚢', '⚓', '🚜', '🚲',
+    '🌋', '🏔️', '🏖️', '🏜️', '🏝️', '🏟️', '🎡', '🎢',
+
+    // OBJECTES I NATURA
+    '💎', '🕶️', '💻', '📱', '⌚', '📷', '💡', '📖',
+    '🔑', '🔨', '🩺', '🔭', '🎁', '🎈', '🏳️‍🌈', '🚩',
+    '☀️', '🌙', '⭐', '☁️', '🌈', '🔥', '💧', '⚡'*/
   ];
 
   @override
@@ -110,7 +131,7 @@ class _PairsRecallState extends State<PairsRecall> {
       int totalSquares = widget.config.rows * widget.config.columns;
       _totalPairsNeeded = totalSquares ~/ 2;
 
-      List<String> shuffledEmojis = List<String>.from(_baseCardContents)..shuffle();
+      List<String> shuffledEmojis = List<String>.from(_cardsEmojis)..shuffle();
       List<String> selectedContent = shuffledEmojis.take(_totalPairsNeeded).toList();
 
       List<String> fullList = [...selectedContent, ...selectedContent];

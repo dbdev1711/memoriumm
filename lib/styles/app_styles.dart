@@ -11,9 +11,9 @@ class AppStyles {
   static const Color cardColor = Color(0xFFFFFBFE);
 
   static const appName = TextStyle(
-    fontSize: 53,
+    fontSize: 50,
     fontWeight: FontWeight.bold,
-    color: Colors.black
+    color: Colors.white
   );
 
   static const idioma = TextStyle(
@@ -57,7 +57,7 @@ class AppStyles {
   );
 
   static const resultsProfile = TextStyle(
-    fontSize: 30,
+    fontSize: 35,
     color: Colors.black,
     fontWeight: FontWeight.bold
   );

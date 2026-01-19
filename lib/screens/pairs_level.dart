@@ -54,7 +54,7 @@ class PairsLevel extends StatelessWidget {
                     builder: (context) => PairsRecall(config: config, language: language)
                   )
                 ),
-                style: ElevatedButton.styleFrom(minimumSize: const Size(200, 60)),
+                style: ElevatedButton.styleFrom(minimumSize: const Size(260, 60)),
                 child: Text(config.levelTitle, style: AppStyles.levelText),
               ),
             );

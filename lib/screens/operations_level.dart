@@ -57,7 +57,7 @@ class OperationsLevel extends StatelessWidget {
                     )
                   )
                 ),
-                style: ElevatedButton.styleFrom(minimumSize: const Size(250, 60)),
+                style: ElevatedButton.styleFrom(minimumSize: const Size(260, 60)),
                 child: Text(config.levelTitle, style: AppStyles.levelText),
               ),
             );

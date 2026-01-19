@@ -77,7 +77,7 @@ class _MenuState extends State<Menu> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text('Memoriumm', style: AppStyles.appBarText),
+          title: const Text('Memoriumm', style: AppStyles.appName),
           centerTitle: true,
         ),
         body: SafeArea(
@@ -98,7 +98,7 @@ class _MenuState extends State<Menu> {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: SizedBox(
-                              width: double.infinity,
+                              width: 300,
                               child: ElevatedButton(
                                 onPressed: () => _navigateToModeSelection(context, mode),
                                 style: ElevatedButton.styleFrom(
@@ -115,7 +115,7 @@ class _MenuState extends State<Menu> {
                                       child: Text(
                                         mode.getTitle(_currentLang),
                                         style: const TextStyle(
-                                          fontSize: 37,
+                                          fontSize: 32,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -126,7 +126,7 @@ class _MenuState extends State<Menu> {
                                       child: Text(
                                         mode.getDescription(_currentLang),
                                         style: const TextStyle(
-                                          fontSize: 25,
+                                          fontSize: 30,
                                           fontWeight: FontWeight.w400,
                                           color: Colors.white,
                                         ),

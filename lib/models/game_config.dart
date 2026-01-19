@@ -41,8 +41,8 @@ enum GameMode {
 
   static const Map<GameMode, Map<String, String>> _descriptions = {
     GameMode.classicMatch: {
-      'cat': 'Troba les parelles',
-      'esp': 'Encuentra las parejas',
+      'cat': 'Troba parelles',
+      'esp': 'Encuentra parejas',
       'eng': 'Get the pairs',
     },
     GameMode.sequenceRecall: {
@@ -51,8 +51,8 @@ enum GameMode {
       'eng': 'Repeat the order',
     },
     GameMode.numberRecall: {
-      'cat': 'Recorda els números',
-      'esp': 'Recuerda los números',
+      'cat': 'Recorda números',
+      'esp': 'Recuerda números',
       'eng': 'Remember the numbers',
     },
     GameMode.operations: {
@@ -66,9 +66,9 @@ enum GameMode {
       'eng': 'Remember the letters',
     },*/
     GameMode.profile: {
-      'cat': 'Configuració i resultats',
-      'esp': 'Configuración y resultados',
-      'eng': 'Results and configuration',
+      'cat': 'Rècords',
+      'esp': 'Récords',
+      'eng': 'Records',
     },
   };
 

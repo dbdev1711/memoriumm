@@ -37,6 +37,7 @@ class OperationsRecall extends StatefulWidget {
 class _OperationsRecallState extends State<OperationsRecall> {
   final List<OperationModel> _operations = [];
   final List<OperationModel> _userSelection = [];
+  bool _isAscending = true; // true: menor a major, false: major a menor
 
   bool _showResultPanel = false;
   String _resultTitle = '';
@@ -103,6 +104,9 @@ class _OperationsRecallState extends State<OperationsRecall> {
       _userSelection.clear();
       _showResultPanel = false;
       _isGameOver = false;
+
+      // Triem l'ordre aleatòriament (50% de probabilitat)
+      _isAscending = Random().nextBool();
 
       _stopwatch.reset();
       _stopwatch.start();
@@ -188,7 +192,13 @@ class _OperationsRecallState extends State<OperationsRecall> {
 
   Future<void> _checkResult() async {
     List<OperationModel> sorted = List.from(_operations);
-    sorted.sort((a, b) => a.result.compareTo(b.result));
+
+    // Apliquem l'ordenació segons el mode triat
+    if (_isAscending) {
+      sorted.sort((a, b) => a.result.compareTo(b.result));
+    } else {
+      sorted.sort((a, b) => b.result.compareTo(a.result));
+    }
 
     bool win = true;
     for (int i = 0; i < sorted.length; i++) {
@@ -247,9 +257,16 @@ class _OperationsRecallState extends State<OperationsRecall> {
   @override
   Widget build(BuildContext context) {
     String appBarTitle = widget.language == 'cat' ? 'Operacions' : (widget.language == 'esp' ? 'Operaciones' : 'Operations');
-    String instruction = widget.language == 'cat'
-        ? 'Ordena de menor a major:'
-        : (widget.language == 'esp' ? 'Ordena de menor a mayor:' : 'Sort in ascending:');
+
+    // Text d'instruccions dinàmic
+    String instruction = '';
+    if (widget.language == 'cat') {
+      instruction = _isAscending ? 'Ordena de menor a major:' : 'Ordena de major a menor:';
+    } else if (widget.language == 'esp') {
+      instruction = _isAscending ? 'Ordena de menor a mayor:' : 'Ordena de mayor a menor:';
+    } else {
+      instruction = _isAscending ? 'Sort in ascending:' : 'Sort in descending:';
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -263,8 +280,19 @@ class _OperationsRecallState extends State<OperationsRecall> {
             Container(
               padding: const EdgeInsets.all(20.0),
               width: double.infinity,
-              color: Colors.blue.shade50,
-              child: Text(instruction, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blueGrey), textAlign: TextAlign.center),
+              color: _isAscending ? Colors.blue.shade50 : Colors.orange.shade50,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  instruction,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: _isAscending ? Colors.blueGrey : Colors.deepOrange.shade700
+                  ),
+                  textAlign: TextAlign.center
+                )
+              ),
             ),
             if (_userSelection.isNotEmpty && !_isGameOver)
               Padding(

@@ -194,11 +194,15 @@ class _NumberRecallState extends State<NumberRecall> {
             if (!_showResultPanel)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Text(
-                  _gameState == 0
-                    ? (widget.language == 'cat' ? 'Memoritza els números' : widget.language == 'esp' ? 'Memoriza los números' : 'Remember the numbers')
-                    : '${widget.language == 'cat' ? 'Troba el ' : widget.language == 'esp' ? 'Encuentra el ' : 'Get '}$_currentNumber',
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    _gameState == 0
+                      ? (widget.language == 'cat' ? 'Memoritza els números' : widget.language == 'esp' ? 'Memoriza los números' : 'Remember the numbers')
+                      : '${widget.language == 'cat' ? 'Troba el ' : widget.language == 'esp' ? 'Encuentra el ' : 'Get '}$_currentNumber',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight
+                        .bold, color: Colors.blueGrey),
+                  ),
                 ),
               ),
 

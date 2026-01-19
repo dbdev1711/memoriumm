@@ -223,12 +223,12 @@ class _SequenceRecallState extends State<SequenceRecall> {
       body: SafeArea(
         child: Column(children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(5),
             child: _isChecking && !_showResultPanel
                 ? AppStyles.sizedBoxHeight70
                 : Column(children: [
                     Text(widget.language == 'cat' ? 'Repeteix la seqüència' : widget.language == 'esp' ? 'Repite la secuencia' : 'Repeat the sequence', style: const TextStyle(fontSize: 18)),
-                    Text('${widget.language == 'cat' ? 'Pas' : widget.language == 'esp' ? 'Paso' : 'Step'}: $_sequenceStep / ${_sequence.length}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold))
+                    Text('${widget.language == 'cat' ? 'Pas' : widget.language == 'esp' ? 'Paso' : 'Step'}: $_sequenceStep / ${_sequence.length}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold))
                   ])
           ),
           Expanded(

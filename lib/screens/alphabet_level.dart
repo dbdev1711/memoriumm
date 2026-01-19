@@ -35,7 +35,7 @@ class AlphabetLevel extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.push(context, MaterialPageRoute(
                   builder: (context) => AlphabetRecall(config: config, language: language))),
-                style: ElevatedButton.styleFrom(minimumSize: const Size(280, 60)),
+                style: ElevatedButton.styleFrom(minimumSize: const Size(260, 60)),
                 child: Text(config.levelTitle, style: AppStyles.levelText),
               ),
             );
