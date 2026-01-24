@@ -1,7 +1,7 @@
-//screens/idioma.dart
 import 'package:flutter/material.dart';
 import '../styles/app_styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'menu.dart';
 
 class Idioma extends StatelessWidget {
@@ -9,8 +9,19 @@ class Idioma extends StatelessWidget {
 
   Future<void> _selectLanguage(BuildContext context, String langCode) async {
     final prefs = await SharedPreferences.getInstance();
+
+    // Recuperem l'idioma anterior per desubscriure'ns si cal
+    final String? oldLang = prefs.getString('language');
+    if (oldLang != null) {
+      await FirebaseMessaging.instance.unsubscribeFromTopic('memorium_$oldLang');
+    }
+
+    // Guardem el nou idioma
     await prefs.setString('language', langCode);
     await prefs.setBool('isFirstRun', false);
+
+    // Subscripció al nou tòpic segons l'elecció
+    await FirebaseMessaging.instance.subscribeToTopic('memorium_$langCode');
 
     if (context.mounted) {
       Navigator.pushReplacement(
@@ -43,7 +54,7 @@ class Idioma extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(0, 30, 0, 30),
       child: GestureDetector(
         onTap: () => _selectLanguage(context, code),
-        child: Image.asset(assetPath, width: 200, height: 120, fit: BoxFit.cover),
+        child: Image.asset(assetPath, width: 180, height: 100, fit: BoxFit.cover),
       ),
     );
   }
