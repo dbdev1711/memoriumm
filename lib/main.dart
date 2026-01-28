@@ -10,6 +10,7 @@ import 'screens/menu.dart';
 import 'screens/idioma.dart';
 import 'styles/app_styles.dart';
 
+// Handler per a missatges en segon pla
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
     await Firebase.initializeApp(
@@ -21,45 +22,66 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
+  // 1. Inicialització essencial de Flutter
   WidgetsFlutterBinding.ensureInitialized();
 
+  // 2. Firebase: Inicialització bàsica sense bloquejar
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  } catch (e) {
+    debugPrint("Firebase initialization skipped: $e");
+  }
 
+  // 3. Preferències locals (molt ràpid)
+  final prefs = await SharedPreferences.getInstance();
+  final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
+  final String savedLang = prefs.getString('language') ?? 'cat';
+
+  // 4. LLANÇAMENT DE LA UI: Això elimina la pantalla en blanc a iOS
+  runApp(App(isFirstRun: isFirstRun, savedLang: savedLang));
+
+  // 5. Serveis asíncrons: Es carreguen mentre l'usuari ja veu l'app
+  _initializeServicesAsync();
+}
+
+/// Executa les peticions pesades sense congelar el fil principal
+Future<void> _initializeServicesAsync() async {
+  // A. Permisos de notificacions (no demanats a Android, bloquejaven iOS)
+  try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     await messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
-
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   } catch (e) {
-    debugPrint("Firebase initialization skipped: $e");
+    debugPrint("Messaging permission error: $e");
   }
 
-  final prefs = await SharedPreferences.getInstance();
-  final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
-  final String savedLang = prefs.getString('language') ?? 'cat';
-
+  // B. Tracking Transparency (el retard d'1s ara no afecta l'arrencada)
   await _initTracking();
-  await MobileAds.instance.initialize();
 
-  RequestConfiguration configuration = RequestConfiguration(
-    testDeviceIds: [
-      "5683a286-0049-4a00-aec6-1c7bffee701b",
-      "a8a55f93-ffc9-4fcc-9d65-cec416f8cc3e",
-      "a44d74c2-7899-46fa-bdd4-b5b527843322",
-    ],
-  );
-  await MobileAds.instance.updateRequestConfiguration(configuration);
-
-  runApp(App(isFirstRun: isFirstRun, savedLang: savedLang));
+  // C. AdMob: Inicialització amb la limitació d'anuncis activa
+  try {
+    await MobileAds.instance.initialize();
+    RequestConfiguration configuration = RequestConfiguration(
+      testDeviceIds: [
+        "5683a286-0049-4a00-aec6-1c7bffee701b",
+        "a8a55f93-ffc9-4fcc-9d65-cec416f8cc3e",
+        "a44d74c2-7899-46fa-bdd4-b5b527843322",
+      ],
+    );
+    await MobileAds.instance.updateRequestConfiguration(configuration);
+  } catch (e) {
+    debugPrint("AdMob error: $e");
+  }
 }
 
 Future<void> _initTracking() async {
+  // Esperem un segon perquè la UI ja estigui muntada
   await Future.delayed(const Duration(milliseconds: 1000));
   try {
     final status = await AppTrackingTransparency.trackingAuthorizationStatus;
