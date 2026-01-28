@@ -1,14 +1,13 @@
-# Carrega el helper de Flutter
-podhelper_path = File.join(File.dirname(File.realpath(__FILE__)), '..', '..', 'flutter', 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
-if File.exist?(podhelper_path)
-  load podhelper_path
-end
+# Utilitzem la variable d'entorn de Flutter directament
+flutter_root = ENV['FLUTTER_ROOT'] || File.join('..', '..', 'flutter')
+load File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
 
 platform :ios, '15.0'
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
+  
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
