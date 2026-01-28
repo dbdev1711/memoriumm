@@ -1,10 +1,7 @@
-# Carrega les funcions de Flutter de forma dinàmica
-flutter_install_all_ios_pods_file = File.join(File.dirname(File.realpath(__FILE__)), '.symlinks', 'plugins', 'flutter_plugin_loader', 'release', 'flutter_plugin_loader.rb')
-if File.exist?(flutter_install_all_ios_pods_file)
-  load flutter_install_all_ios_pods_file
-end
-
 platform :ios, '15.0'
+
+# Aquesta línia importa la configuració de Flutter des de l'SDK de la build machine
+load File.join(File.dirname(File.realpath(__FILE__)), 'Generated.podspec')
 
 target 'Runner' do
   use_frameworks!
