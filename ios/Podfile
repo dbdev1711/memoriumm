@@ -1,3 +1,6 @@
+# Aquesta línia és la que falta i causa l'error
+load File.join(File.dirname(File.realpath(__FILE__)), '.symlinks', 'plugins', 'flutter_plugin_loader', 'release', 'flutter_plugin_loader.rb')
+
 platform :ios, '15.0'
 
 target 'Runner' do
