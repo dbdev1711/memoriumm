@@ -1,12 +1,14 @@
-platform :ios, '15.0'
+# Carrega el helper de Flutter
+podhelper_path = File.join(File.dirname(File.realpath(__FILE__)), '..', '..', 'flutter', 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+if File.exist?(podhelper_path)
+  load podhelper_path
+end
 
-# Aquesta línia importa la configuració de Flutter des de l'SDK de la build machine
-load File.join(File.dirname(File.realpath(__FILE__)), 'Generated.podspec')
+platform :ios, '15.0'
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
-
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
