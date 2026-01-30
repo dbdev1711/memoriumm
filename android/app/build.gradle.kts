@@ -40,16 +40,27 @@ android {
 
     signingConfigs {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"]?.toString()
-            keyPassword = keystoreProperties["keyPassword"]?.toString()
-            storeFile = file(keystoreProperties["storeFile"]?.toString() ?: "")
-            storePassword = keystoreProperties["storePassword"]?.toString()
+            // Verifico si el fitxer de propietats existeix i té la ruta del keystore
+            val keyPath = keystoreProperties["storeFile"]?.toString()
+            if (keystorePropertiesFile.exists() && !keyPath.isNullOrEmpty()) {
+                keyAlias = keystoreProperties["keyAlias"]?.toString()
+                keyPassword = keystoreProperties["keyPassword"]?.toString()
+                storeFile = file(keyPath)
+                storePassword = keystoreProperties["storePassword"]?.toString()
+            } else {
+                // Si no es troba, mostro un avís però no tallo la build
+                println("AVÍS: No s'ha trobat key.properties o storeFile. La build no estarà signada.")
+            }
         }
     }
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
+            // Només assigno la signatura si el fitxer storeFile s'ha pogut carregar
+            val releaseConfig = signingConfigs.getByName("release")
+            if (releaseConfig.storeFile != null) {
+                signingConfig = releaseConfig
+            }
             isMinifyEnabled = false
             isShrinkResources = false
         }
