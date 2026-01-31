@@ -6,6 +6,7 @@ import 'operations_level.dart';
 import 'pairs_level.dart';
 import 'sequence_level.dart';
 import 'number_level.dart';
+import 'alphabet_level.dart';
 import 'profile.dart';
 
 class Menu extends StatefulWidget {
@@ -35,7 +36,6 @@ class _MenuState extends State<Menu> {
 
   void _navigateToModeSelection(BuildContext context, GameMode mode) {
     Widget targetScreen;
-
     switch (mode) {
       case GameMode.classicMatch:
         targetScreen = PairsLevel(mode: mode, language: _currentLang);
@@ -49,19 +49,18 @@ class _MenuState extends State<Menu> {
       case GameMode.operations:
         targetScreen = OperationsLevel(mode: mode, language: _currentLang);
         break;
+      case GameMode.alphabetRecall:
+        targetScreen = AlphabetLevel(mode: mode, language: _currentLang);
+        break;
       case GameMode.profile:
         targetScreen = Profile(language: _currentLang);
         break;
-      default:
-        return;
     }
 
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => targetScreen),
-    ).then((_) {
-      _loadSettings();
-    });
+    ).then((_) => _loadSettings());
   }
 
   @override
@@ -70,7 +69,7 @@ class _MenuState extends State<Menu> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final modes = GameMode.values.where((m) => m.name != 'alphabetRecall').toList();
+    final modes = GameMode.values.toList();
 
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
@@ -79,69 +78,67 @@ class _MenuState extends State<Menu> {
           automaticallyImplyLeading: false,
           title: const Text('Memoriumm', style: AppStyles.appName),
           centerTitle: true,
+          toolbarHeight: 40,
+          bottom: const PreferredSize(
+            preferredSize: Size.fromHeight(20),
+            child: SizedBox(),
+          ),
         ),
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
+              final double availableHeight = constraints.maxHeight;
+              final double buttonHeight = (availableHeight / modes.length) - 12;
+
               return Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 320,
-                    maxHeight: constraints.maxHeight,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: modes.map((mode) {
-                        return Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: SizedBox(
-                              width: 300,
-                              child: ElevatedButton(
-                                onPressed: () => _navigateToModeSelection(context, mode),
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 70,
+                      vertical: 5),
+                  child: Column(
+                    children: modes.map((mode) {
+                      return Container(
+                        height: buttonHeight,
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => _navigateToModeSelection(context, mode),
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            elevation: 3,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  mode.getTitle(_currentLang),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 30,
                                   ),
-                                  elevation: 6,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        mode.getTitle(_currentLang),
-                                        style: const TextStyle(
-                                          fontSize: 32,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        mode.getDescription(_currentLang),
-                                        style: const TextStyle(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w400,
-                                          color: Colors.white,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  ],
                                 ),
                               ),
-                            ),
+                              const SizedBox(height: 1),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  mode.getDescription(_currentLang),
+                                  style: const TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        );
-                      }).toList(),
-                    ),
+                        ),
+                      );
+                    }).toList(),
                   ),
                 ),
               );

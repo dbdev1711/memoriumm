@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,7 +11,6 @@ import 'screens/menu.dart';
 import 'screens/idioma.dart';
 import 'styles/app_styles.dart';
 
-// Handler per a missatges en segon pla
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
     await Firebase.initializeApp(
@@ -22,34 +22,31 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-  // 1. Inicialització essencial de Flutter
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Firebase: Inicialització bàsica sense bloquejar
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+    await analytics.logAppOpen();
+
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   } catch (e) {
     debugPrint("Firebase initialization skipped: $e");
   }
 
-  // 3. Preferències locals (molt ràpid)
   final prefs = await SharedPreferences.getInstance();
   final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
   final String savedLang = prefs.getString('language') ?? 'cat';
 
-  // 4. LLANÇAMENT DE LA UI: Això elimina la pantalla en blanc a iOS
   runApp(App(isFirstRun: isFirstRun, savedLang: savedLang));
 
-  // 5. Serveis asíncrons: Es carreguen mentre l'usuari ja veu l'app
   _initializeServicesAsync();
 }
 
-/// Executa les peticions pesades sense congelar el fil principal
 Future<void> _initializeServicesAsync() async {
-  // A. Permisos de notificacions (no demanats a Android, bloquejaven iOS)
   try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     await messaging.requestPermission(
@@ -61,10 +58,8 @@ Future<void> _initializeServicesAsync() async {
     debugPrint("Messaging permission error: $e");
   }
 
-  // B. Tracking Transparency (el retard d'1s ara no afecta l'arrencada)
   await _initTracking();
 
-  // C. AdMob: Inicialització amb la limitació d'anuncis activa
   try {
     await MobileAds.instance.initialize();
     RequestConfiguration configuration = RequestConfiguration(
@@ -81,7 +76,6 @@ Future<void> _initializeServicesAsync() async {
 }
 
 Future<void> _initTracking() async {
-  // Esperem un segon perquè la UI ja estigui muntada
   await Future.delayed(const Duration(milliseconds: 1000));
   try {
     final status = await AppTrackingTransparency.trackingAuthorizationStatus;
@@ -105,6 +99,9 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Memoriumm',
       theme: AppStyles.lightTheme,
+      navigatorObservers: [
+        FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
+      ],
       builder: (context, child) {
         final double shortestSide = MediaQuery.of(context).size.shortestSide;
         final bool isTablet = shortestSide >= 600;
