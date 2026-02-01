@@ -29,12 +29,12 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-    await analytics.logAppOpen();
+    await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+    await FirebaseAnalytics.instance.logAppOpen();
 
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   } catch (e) {
-    debugPrint("Firebase initialization skipped: $e");
+    debugPrint("Firebase initialization error: $e");
   }
 
   final prefs = await SharedPreferences.getInstance();
@@ -76,15 +76,17 @@ Future<void> _initializeServicesAsync() async {
 }
 
 Future<void> _initTracking() async {
-  await Future.delayed(const Duration(milliseconds: 1000));
-  try {
-    final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-    if (status == TrackingStatus.notDetermined) {
-      await AppTrackingTransparency.requestTrackingAuthorization();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    try {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        await Future.delayed(const Duration(milliseconds: 800));
+        await AppTrackingTransparency.requestTrackingAuthorization();
+      }
+    } catch (e) {
+      debugPrint("Tracking error: $e");
     }
-  } catch (e) {
-    debugPrint("Tracking error: $e");
-  }
+  });
 }
 
 class App extends StatelessWidget {
