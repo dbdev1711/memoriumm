@@ -58,6 +58,8 @@ Future<void> _initializeServicesAsync() async {
     debugPrint("Messaging permission error: $e");
   }
 
+  await Future.delayed(const Duration(seconds: 4));
+
   await _initTracking();
 
   try {
