@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
+    <true/>
     <key>NSAppTransportSecurity</key>
     <dict>
         <key>NSAllowsArbitraryLoads</key>
@@ -14,7 +14,7 @@
     <key>NSUserTrackingUsageDescription</key>
     <string>Aquest identificador s'utilitzarà per mostrar-te anuncis personalitzats i millorar la teva experiència de joc.</string>
     <key>NSLocalNotificationsUsageDescription</key>
-    <string>Utilitzem notificacions per recordar-te els teus exercicis de memòria els caps de setmana.</string>
+    <string>Notificacions per recordar-te els teus exercicis de memòria els caps de setmana.</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>fetch</string>

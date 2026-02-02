@@ -17,7 +17,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    debugPrint("Firebase background error: $e");
+    debugPrint("$e");
   }
 }
 
@@ -31,10 +31,9 @@ void main() async {
 
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await FirebaseAnalytics.instance.logAppOpen();
-
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   } catch (e) {
-    debugPrint("Firebase initialization error: $e");
+    debugPrint("$e");
   }
 
   final prefs = await SharedPreferences.getInstance();
@@ -49,17 +48,16 @@ void main() async {
 Future<void> _initializeServicesAsync() async {
   try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
-    await messaging.requestPermission(
+    messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
   } catch (e) {
-    debugPrint("Messaging permission error: $e");
+    debugPrint("$e");
   }
 
-  await Future.delayed(const Duration(seconds: 4));
-
+  await Future.delayed(const Duration(seconds: 1));
   await _initTracking();
 
   try {
@@ -73,7 +71,7 @@ Future<void> _initializeServicesAsync() async {
     );
     await MobileAds.instance.updateRequestConfiguration(configuration);
   } catch (e) {
-    debugPrint("AdMob error: $e");
+    debugPrint("$e");
   }
 }
 
@@ -82,11 +80,11 @@ Future<void> _initTracking() async {
     try {
       final status = await AppTrackingTransparency.trackingAuthorizationStatus;
       if (status == TrackingStatus.notDetermined) {
-        await Future.delayed(const Duration(milliseconds: 800));
+        await Future.delayed(const Duration(milliseconds: 500));
         await AppTrackingTransparency.requestTrackingAuthorization();
       }
     } catch (e) {
-      debugPrint("Tracking error: $e");
+      debugPrint("$e");
     }
   });
 }
