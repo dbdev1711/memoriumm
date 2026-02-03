@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
@@ -42,40 +41,11 @@ void main() async {
 
   runApp(App(isFirstRun: isFirstRun, savedLang: savedLang));
 
-  _initializeServicesAsync();
+  // Inicialitzem anuncis sense demanar permisos aquí per evitar bloquejos
+  _initializeAdsOnly();
 }
 
-Future<void> _initializeServicesAsync() async {
-  try {
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    await messaging.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      String? token = await messaging.getToken();
-      debugPrint("------------------------------------------");
-      debugPrint("TOKEN FCM DEL MEU IPHONE: $token");
-      debugPrint("------------------------------------------");
-    } else {
-      debugPrint("L'usuari ha denegat el permís de notificacions.");
-    }
-  } catch (e) {
-    debugPrint("Error inicialitzant Firebase Messaging: $e");
-  }
-
-  await Future.delayed(const Duration(seconds: 1));
-  await _initTracking();
-
+Future<void> _initializeAdsOnly() async {
   try {
     await MobileAds.instance.initialize();
     RequestConfiguration configuration = RequestConfiguration(
@@ -89,20 +59,6 @@ Future<void> _initializeServicesAsync() async {
   } catch (e) {
     debugPrint("$e");
   }
-}
-
-Future<void> _initTracking() async {
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    try {
-      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-      if (status == TrackingStatus.notDetermined) {
-        await Future.delayed(const Duration(milliseconds: 500));
-        await AppTrackingTransparency.requestTrackingAuthorization();
-      }
-    } catch (e) {
-      debugPrint("$e");
-    }
-  });
 }
 
 class App extends StatelessWidget {
