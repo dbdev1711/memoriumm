@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBjsqAKqG9uUNjv62PR0wQ4ZBUQhexXuAg',
-    appId: '1:511117194437:web:7de4e0ce9678a5e1ff2cac',
-    messagingSenderId: '511117194437',
-    projectId: 'memoriumm-globalcatdev',
-    authDomain: 'memoriumm-globalcatdev.firebaseapp.com',
-    storageBucket: 'memoriumm-globalcatdev.firebasestorage.app',
-    measurementId: 'G-C1Q5L7Y58B',
+    apiKey: 'AIzaSyBWgm5k3ndyG0SDUQOBqf-6OWwe4djFL1Y',
+    appId: '1:834754390012:web:f4eee5e1ac7d2499bbf479',
+    messagingSenderId: '834754390012',
+    projectId: 'memoriumm-de924',
+    authDomain: 'memoriumm-de924.firebaseapp.com',
+    storageBucket: 'memoriumm-de924.firebasestorage.app',
+    measurementId: 'G-GG58XX1L39',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAK8tLTvYQdi_m5_YfgoY4Wud37Su5Zva0',
-    appId: '1:511117194437:android:fd3be8127d6b9c35ff2cac',
-    messagingSenderId: '511117194437',
-    projectId: 'memoriumm-globalcatdev',
-    storageBucket: 'memoriumm-globalcatdev.firebasestorage.app',
+    apiKey: 'AIzaSyDdXhGA0DO0ZD9rzqn3F1-YLoh3lsip-xQ',
+    appId: '1:834754390012:android:2bd1ff7b03711e53bbf479',
+    messagingSenderId: '834754390012',
+    projectId: 'memoriumm-de924',
+    storageBucket: 'memoriumm-de924.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA8WMrwYmvuICiuqnzzbATl7O7RhOH0l5w',
-    appId: '1:511117194437:ios:0198b367eee26506ff2cac',
-    messagingSenderId: '511117194437',
-    projectId: 'memoriumm-globalcatdev',
-    storageBucket: 'memoriumm-globalcatdev.firebasestorage.app',
+    apiKey: 'AIzaSyCYU8YjLeFtIqE-63AJmDO8j22Er5P5S0g',
+    appId: '1:834754390012:ios:2e69b750e7241edabbf479',
+    messagingSenderId: '834754390012',
+    projectId: 'memoriumm-de924',
+    storageBucket: 'memoriumm-de924.firebasestorage.app',
     iosBundleId: 'db.memorium.memorium',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA8WMrwYmvuICiuqnzzbATl7O7RhOH0l5w',
-    appId: '1:511117194437:ios:0198b367eee26506ff2cac',
-    messagingSenderId: '511117194437',
-    projectId: 'memoriumm-globalcatdev',
-    storageBucket: 'memoriumm-globalcatdev.firebasestorage.app',
+    apiKey: 'AIzaSyCYU8YjLeFtIqE-63AJmDO8j22Er5P5S0g',
+    appId: '1:834754390012:ios:2e69b750e7241edabbf479',
+    messagingSenderId: '834754390012',
+    projectId: 'memoriumm-de924',
+    storageBucket: 'memoriumm-de924.firebasestorage.app',
     iosBundleId: 'db.memorium.memorium',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBjsqAKqG9uUNjv62PR0wQ4ZBUQhexXuAg',
-    appId: '1:511117194437:web:4c0632d0e4030481ff2cac',
-    messagingSenderId: '511117194437',
-    projectId: 'memoriumm-globalcatdev',
-    authDomain: 'memoriumm-globalcatdev.firebaseapp.com',
-    storageBucket: 'memoriumm-globalcatdev.firebasestorage.app',
-    measurementId: 'G-D2KP7PBKGE',
+    apiKey: 'AIzaSyBWgm5k3ndyG0SDUQOBqf-6OWwe4djFL1Y',
+    appId: '1:834754390012:web:c4ea273f361711dfbbf479',
+    messagingSenderId: '834754390012',
+    projectId: 'memoriumm-de924',
+    authDomain: 'memoriumm-de924.firebaseapp.com',
+    storageBucket: 'memoriumm-de924.firebasestorage.app',
+    measurementId: 'G-TH1BGBMHKB',
   );
+
 }

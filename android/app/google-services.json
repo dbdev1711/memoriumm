@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "511117194437",
-    "project_id": "memoriumm-globalcatdev",
-    "storage_bucket": "memoriumm-globalcatdev.firebasestorage.app"
+    "project_number": "834754390012",
+    "project_id": "memoriumm-de924",
+    "storage_bucket": "memoriumm-de924.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:511117194437:android:fd3be8127d6b9c35ff2cac",
+        "mobilesdk_app_id": "1:834754390012:android:2bd1ff7b03711e53bbf479",
         "android_client_info": {
           "package_name": "db.memorium.memorium"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAK8tLTvYQdi_m5_YfgoY4Wud37Su5Zva0"
+          "current_key": "AIzaSyDdXhGA0DO0ZD9rzqn3F1-YLoh3lsip-xQ"
         }
       ],
       "services": {
