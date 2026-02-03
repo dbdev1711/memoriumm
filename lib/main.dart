@@ -48,13 +48,29 @@ void main() async {
 Future<void> _initializeServicesAsync() async {
   try {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
-    messaging.requestPermission(
+
+    NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
+
+    await messaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      String? token = await messaging.getToken();
+      debugPrint("------------------------------------------");
+      debugPrint("TOKEN FCM DEL MEU IPHONE: $token");
+      debugPrint("------------------------------------------");
+    } else {
+      debugPrint("L'usuari ha denegat el permís de notificacions.");
+    }
   } catch (e) {
-    debugPrint("$e");
+    debugPrint("Error inicialitzant Firebase Messaging: $e");
   }
 
   await Future.delayed(const Duration(seconds: 1));
