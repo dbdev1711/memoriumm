@@ -1,24 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>FirebaseAppDelegateProxyEnabled</key>
-    <true/>
-    <key>FirebaseMessagingAutoInitEnabled</key>
-    <false/>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
-    <key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-5400203683183472~7849137563</string>
-    <key>NSUserTrackingUsageDescription</key>
-    <string>Aquest identificador s'utilitzarà per mostrar-te anuncis personalitzats i millorar la teva experiència de joc.</string>
-    <key>NSLocalNotificationsUsageDescription</key>
-    <string>Notificacions per recordar-te els teus exercicis de memòria els caps de setmana.</string>
-    <key>NSUserNotificationUsageDescription</key>
-    <string>T'enviem recordatoris per ajudar-te amb els exercicis de memòria.</string>
+teus exercicis de memòria els caps de setmana.</string>
     <key>UIBackgroundModes</key>
     <array>
         <string>fetch</string>

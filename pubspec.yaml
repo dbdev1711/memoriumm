@@ -2,7 +2,7 @@ name: memorium
 description: "Joc per treballar la memòria implementat en Flutter."
 publish_to: 'none'
 
-version: 1.6.3+50
+version: 1.6.4+51
 
 environment:
   sdk: ^3.9.2

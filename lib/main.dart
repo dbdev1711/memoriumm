@@ -16,37 +16,53 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    debugPrint("$e");
+    debugPrint("Background Messaging Error: $e");
   }
 }
 
 void main() async {
+  // Capturem errors del framework de Flutter
+  FlutterError.onError = (details) {
+    debugPrint("⚠️ FLUTTER ERROR: ${details.exception}");
+    debugPrint("STACK: ${details.stack}");
+  };
+
   WidgetsFlutterBinding.ensureInitialized();
+  debugPrint("🚀 INICIANT APLICACIÓ...");
 
   try {
+    debugPrint("⚙️ CONFIGURANT FIREBASE...");
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    debugPrint("✅ FIREBASE INICIALITZAT");
 
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await FirebaseAnalytics.instance.logAppOpen();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  } catch (e) {
-    debugPrint("$e");
+  } catch (e, stack) {
+    debugPrint("❌ ERROR FATAL FIREBASE: $e");
+    debugPrint("STACKTRACE: $stack");
   }
 
-  final prefs = await SharedPreferences.getInstance();
-  final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
-  final String savedLang = prefs.getString('language') ?? 'cat';
+  try {
+    debugPrint("📂 LLEGINT PREFERÈNCIES...");
+    final prefs = await SharedPreferences.getInstance();
+    final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
+    final String savedLang = prefs.getString('language') ?? 'cat';
+    debugPrint("✅ PREFERÈNCIES CARREGADES (FirstRun: $isFirstRun)");
 
-  runApp(App(isFirstRun: isFirstRun, savedLang: savedLang));
+    runApp(App(isFirstRun: isFirstRun, savedLang: savedLang));
+  } catch (e) {
+    debugPrint("❌ ERROR PREFERÈNCIES O RUNAPP: $e");
+  }
 
-  // Inicialitzem anuncis sense demanar permisos aquí per evitar bloquejos
   _initializeAdsOnly();
 }
 
 Future<void> _initializeAdsOnly() async {
   try {
+    debugPrint("📺 INICIANT ADMOB...");
     await MobileAds.instance.initialize();
     RequestConfiguration configuration = RequestConfiguration(
       testDeviceIds: [
@@ -56,8 +72,9 @@ Future<void> _initializeAdsOnly() async {
       ],
     );
     await MobileAds.instance.updateRequestConfiguration(configuration);
+    debugPrint("✅ ADMOB OK");
   } catch (e) {
-    debugPrint("$e");
+    debugPrint("❌ ERROR ADMOB: $e");
   }
 }
 
