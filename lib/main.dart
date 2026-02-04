@@ -10,6 +10,8 @@ import 'screens/menu.dart';
 import 'screens/idioma.dart';
 import 'styles/app_styles.dart';
 
+String firebaseDebugStatus = "Pendent";
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   try {
     await Firebase.initializeApp(
@@ -21,36 +23,32 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-  // Capturem errors del framework de Flutter
   FlutterError.onError = (details) {
     debugPrint("⚠️ FLUTTER ERROR: ${details.exception}");
     debugPrint("STACK: ${details.stack}");
   };
 
   WidgetsFlutterBinding.ensureInitialized();
-  debugPrint("🚀 INICIANT APLICACIÓ...");
 
   try {
-    debugPrint("⚙️ CONFIGURANT FIREBASE...");
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    debugPrint("✅ FIREBASE INICIALITZAT");
 
     await FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
     await FirebaseAnalytics.instance.logAppOpen();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    firebaseDebugStatus = "✅ OK";
   } catch (e, stack) {
+    firebaseDebugStatus = "❌ Error: $e";
     debugPrint("❌ ERROR FATAL FIREBASE: $e");
     debugPrint("STACKTRACE: $stack");
   }
 
   try {
-    debugPrint("📂 LLEGINT PREFERÈNCIES...");
     final prefs = await SharedPreferences.getInstance();
     final bool isFirstRun = prefs.getBool('isFirstRun') ?? true;
     final String savedLang = prefs.getString('language') ?? 'cat';
-    debugPrint("✅ PREFERÈNCIES CARREGADES (FirstRun: $isFirstRun)");
 
     runApp(App(isFirstRun: isFirstRun, savedLang: savedLang));
   } catch (e) {
@@ -62,7 +60,6 @@ void main() async {
 
 Future<void> _initializeAdsOnly() async {
   try {
-    debugPrint("📺 INICIANT ADMOB...");
     await MobileAds.instance.initialize();
     RequestConfiguration configuration = RequestConfiguration(
       testDeviceIds: [
@@ -72,7 +69,6 @@ Future<void> _initializeAdsOnly() async {
       ],
     );
     await MobileAds.instance.updateRequestConfiguration(configuration);
-    debugPrint("✅ ADMOB OK");
   } catch (e) {
     debugPrint("❌ ERROR ADMOB: $e");
   }
@@ -110,7 +106,26 @@ class App extends StatelessWidget {
             DeviceOrientation.landscapeRight,
           ]);
         }
-        return child!;
+        return Stack(
+          children: [
+            child!,
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: SafeArea(
+                child: Text(
+                  firebaseDebugStatus,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: Colors.red,
+                    backgroundColor: Colors.white70,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
       },
       home: isFirstRun ? const Idioma() : const Menu(),
     );
